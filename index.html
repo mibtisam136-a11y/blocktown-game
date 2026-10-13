@@ -3324,7 +3324,7 @@ function animMe(dt){if(!me.mixer)return;const spd=Math.hypot(P.mvx||0,P.mvz||0);
  setAct(me,mv>0?(spr?'run':'walk'):'idle',.2);if(me.act.walk)me.act.walk.timeScale=1.5;me.mixer.update(dt);}
 {const _am=animMe;animMe=function(dt){_am(dt);aimPoseMe();};}
 
-if(!/netlify\.app$/.test(location.hostname)&&location.hostname!=='localhost'){const d=document.createElement('a');d.href='https://blocktown-game.netlify.app';d.target='_blank';d.rel='noopener';d.textContent='Realistic people & cars only load on the full version — tap to play at blocktown-game.netlify.app';d.style.cssText='position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);z-index:60;background:#0f172a;color:#fff;border:2px solid #38bdf8;border-radius:12px;padding:8px 14px;font:700 13px system-ui,sans-serif;text-decoration:none;max-width:92vw;text-align:center';document.body.appendChild(d);setTimeout(()=>d.remove(),20000);}
+
 /* =====================================================================
    v20 — air force update: fighter jets, private jet, attack helicopters,
    new realistic cars, Fort Blockade air base, vehicle weapons, polish
