@@ -335,9 +335,10 @@ const ISLANDS=[
  {name:'Port Bay',cx:430,cz:0,h:115,rx:[370,430,490],rz:[-60,0,60],tex:1024,sandIn:6,npc:isTouch?5:8,traffic:isTouch?3:4},
  {name:'Palm Key',cx:0,cz:400,h:110,rx:[-55,0,55],rz:[360,440],tex:1024,sandIn:16,npc:isTouch?5:8,traffic:isTouch?2:3},
  {name:'Sky Harbour',cx:-480,cz:40,h:150,rx:[-460,-400],rz:[80,140],tex:1024,sandIn:8,npc:isTouch?4:6,traffic:2},
- {name:'Fort Blockade',cx:480,cz:430,h:150,rx:[380,480,580],rz:[360,440],tex:1024,sandIn:8,npc:isTouch?4:6,traffic:2}];
+ {name:'Fort Blockade',cx:480,cz:430,h:150,rx:[380,480,580],rz:[360,440],tex:1024,sandIn:8,npc:isTouch?4:6,traffic:2},
+ {name:'Neon Heights',cx:760,cz:0,h:120,rx:[700,760,820],rz:[-60,0,60],tex:1024,sandIn:8,npc:isTouch?6:10,traffic:2}];
 ISLANDS.forEach(i=>{i.sx=i.rx.flatMap(r=>[r-7,r+7]).sort((a,b)=>a-b);i.sz=i.rz.flatMap(r=>[r-7,r+7]).sort((a,b)=>a-b);});
-const [MAIN,PORT,PALM,AIR,FORT]=ISLANDS;
+const [MAIN,PORT,PALM,AIR,FORT,NEON]=ISLANDS;
 const DECKS=[{x0:205,x1:315,z0:-7,z1:7,kind:'x'},{x0:-7,x1:7,z0:205,z1:290,kind:'z'},{x0:-330,x1:-205,z0:73,z1:87,kind:'x'},{x0:36,x1:44,z0:507,z1:552,kind:'pier'}];
 const MTN={cx:0,cz:-525,h:175};MTN.x0=MTN.cx-MTN.h;MTN.x1=MTN.cx+MTN.h;MTN.z0=MTN.cz-MTN.h;MTN.z1=MTN.cz+MTN.h;
 const MPEAKS=[[40,-575,78,62],[-75,-480,48,52],[95,-445,32,42],[-40,-620,40,48],[110,-610,36,40],[-120,-560,26,38]];
@@ -602,7 +603,6 @@ function mansion(){const WH='#f6f4ef',ST='#d6c6a8',WD='#8a5a36',WD2='#5e3a22',DK
  for(const x of[50.6,61.4]){B.box(x,0,449,1.4,3.2,1.4,ST);B.box(x,3.2,449,1.6,.25,1.6,WH);B.box(x,3.45,449,.5,.5,.5,GD);lampPos.push(x,3.7,449);sol(x-.7,x+.7,448.3,449.7,3.4);}
  B.box(56,4.0,449,12.4,.35,.4,DK);signBoard('VIP ESTATE',56,4.95,448.6,Math.PI,8,1.5,'#111214','#d4af37','#d4af37');
  // ---------- forecourt: fountain + parking ----------
- B.add(G.cyl,46,0,455.5,4.2,.6,4.2,ST);B.add(G.cyl,46,.45,455.5,3.7,.2,3.7,'#3fb7e6');B.add(G.cyl,46,0,455.5,.7,2.2,.7,WH);B.add(G.cyl,46,2.2,455.5,1.6,.25,1.6,ST);B.add(G.cyl,46,2.45,455.5,.4,1,.4,GD);sol(41.9,50.1,451.4,459.6,.7);
  // ---------- MANSION: ground floor (x 34..78, z 462..477) ----------
  B.box(56,0,469.5,44.6,.14,15.6,'#f1ebdf');for(let x=35;x<78;x+=3)B.box(x,.141,469.5,.04,.005,15,'#dcd3c2');
  win(34,462,46,462,0,ST);win(46,462,62,462,0,ST);wl(66,462,78,462,0,WH);
@@ -1037,10 +1037,10 @@ B=new Builder();PT=makePainter(PORT);PORT.pt=PT;
 paintBase(PT,PORT,'#69b84a');
 lotPaint(PT,498,-108,540,108,'#8c8f96');lotPaint(PT,322,-110,540,-70,'#8c8f96');lotPaint(PT,322,70,540,110,'#9aa0aa');
 helipad(PT,HELIPADS[1].x,HELIPADS[1].z);PT.rect(438,8,482,52,'#c9c6bf');
-paintRoads(PT,PORT);roadDetail(PT,PORT);streetFurniture(PORT,true);connector(PT,315,-6,363,6);
+paintRoads(PT,PORT);roadDetail(PT,PORT);streetFurniture(PORT,true);connector(PT,315,-6,363,6);connector(PT,498,-7,545,7);
 tower(400,-30,22,22,rnd(30,40),'#9fb6c9');tower(470,30,24,20,rnd(34,44),'#cfd6dd');tower(462,-38,16,16,rnd(20,26),'#e6b8a2');
 warehouse(410,90,30,18,'#c96f4a');warehouse(460,90,26,18,'#6f8fb3');warehouse(400,-90,28,16,'#7c9a6b');
-for(let k=0;k<14;k++){containers(rnd(505,535),-100+k*14+rnd(-1,1),0,1+((Math.random()*3)|0));}
+for(let k=0;k<14;k++){if(k===7)continue;containers(rnd(505,535),-100+k*14+rnd(-1,1),0,1+((Math.random()*3)|0));}
 for(let k=0;k<6;k++)containers(440+k*8,-92+rnd(-2,2),Math.PI/2,1+((Math.random()*2)|0));
 crane(530,-40);crane(530,40);
 B.box(HELIPADS[1].x-14,0,HELIPADS[1].z,8,4,10,'#d9d4cc');solid(HELIPADS[1].x-18,HELIPADS[1].x-10,HELIPADS[1].z-5,HELIPADS[1].z+5,4);
@@ -1056,7 +1056,7 @@ paintRoads(PT,PALM);roadDetail(PT,PALM);streetFurniture(PALM,false);connector(PT
 villa(-28,388,-1);villa(28,388,-1);villa(-30,418,1);villa(28,418,1);
 for(const x of[-85,-60,-35,35,60,85]){villa(x,322,1);}
 for(const z of[372,410]){villa(-84,z,1);villa(84,z,1);}
-vipEstate2();
+mansion();
 for(let k=0;k<70;k++){const x=rnd(-102,102),z=rnd(298,502);const nearRoad=PALM.rx.some(r=>Math.abs(x-r)<10)&&z>342&&z<458||PALM.rz.some(r=>Math.abs(z-r)<10)&&Math.abs(x)<66||(x>58&&Math.abs(z-360)<11)||(Math.abs(x)<10&&z<355);if(nearRoad||(x>8&&x<96&&z>445&&z<497))continue;
  if(boxes.some(b=>x>b.x0-3&&x<b.x1+3&&z>b.z0-3&&z<b.z1+3))continue;palm(x,z);}
 for(let k=0;k<12;k++)umbrella(rnd(-95,95),rnd(497,505));
@@ -1147,6 +1147,42 @@ for(let k=0;k<80;k++){const x=rnd(336,620),z=rnd(290,575);if(z>446&&z<540)contin
  if(boxes.some(b=>x>b.x0-4&&x<b.x1+4&&z>b.z0-4&&z<b.z1+4))continue;if(Math.hypot(x-412,z-400)<13||Math.hypot(x-448,z-400)<13||Math.hypot(x-512,z-400)<13||Math.hypot(x-548,z-400)<13)continue;tree(x,z,'pine');}
 islandMeshes.push({isl:FORT,b:B,pt:PT});
 
+
+/* ---- Neon Heights: downtown island east of Port Bay (v21) ---- */
+B=new Builder();PT=makePainter(NEON);NEON.pt=PT;
+paintBase(PT,NEON,'#5fb544');
+// plazas + lots
+lotPaint(PT,708,8,752,52,'#a3a7ae');lotPaint(PT,768,8,812,52,'#8f939b');lotPaint(PT,768,-52,812,-8,'#b9bcc2');
+PT.rect(708,-52,752,-8,'#c9c4b8');PT.rect(712,-46,748,-14,'#3f9b3a');PT.ring(730,-30,6,.3,'#ffffff');PT.rect(729.8,-46,730.2,-14,'#ffffff');
+for(const [a,b] of[[712,-46],[748,-46],[712,-14],[748,-14]])PT.circ(a,b,.6,'#ffffff');
+paintRoads(PT,NEON);roadDetail(PT,NEON);streetFurniture(NEON,true);connector(PT,640,-7,692,7);
+DECKS.push({x0:545,x1:640,z0:-7,z1:7,kind:'x'});
+// --- Golden Palace casino ---
+{const x=730,z=30;B.box(x,0,z,36,11,30,'#22163a');B.box(x,11,z,38,.8,32,'#d4af37');B.box(x,11.8,z,30,6,22,'#2d1d4a');B.box(x,17.8,z,31,.6,23,'#d4af37');
+ for(let k=-15;k<=15;k+=3){GB.box(x+k,1.2,z-15.05,2.2,7.5,.2,'#ffd27a');}B.box(x,0,z-17,16,.2,4,'#b91c1c');for(const s of[-1,1]){B.add(G.cyl,x+s*7.5,0,z-18.6,.35,6,.35,'#d4af37');}B.box(x,6,z-18.6,16,.5,3.6,'#d4af37');
+ solid(x-18,x+18,z-15,z+15,18.4);signBoard('GOLDEN PALACE CASINO',x,13.6,z-15.3,Math.PI,22,3.2,'#1b1030','#ffd27a','#d4af37');
+ for(let k=0;k<10;k++)lampPos.push(x-15+k*3.3,10.8,z-15.4);}
+// --- downtown skyscrapers ---
+tower(782,-38,16,16,72,'#8fb3cf');tower(802,-20,14,14,56,'#cfd6dd');tower(781,-16,10,10,38,'#e6b8a2');tower(803,-44,10,10,30,'#9fb6c9');
+for(const [x,z,h] of[[782,-38,72],[802,-20,56]]){B.add(G.cyl,x,h+1.6,z,.18,8,.18,'#cccccc');B.box(x,h+9.4,z,.5,.5,.5,'#ff2a2a');lampPos.push(x,h+9.7,z);}
+// --- stadium ---
+{const x=730,z=-30;for(const [cx,cz,w,d] of[[x,-50,44,4],[x,-10,44,4],[708,z,4,44],[752,z,4,44]]){for(let t=0;t<4;t++){const o=t*1.1;B.box(cx+(w<d?(cx<x?-o:o):0),t*1.6,cz+(w>d?(cz<z?-o:o):0),w>d?w:2.2,1.6,w>d?2.2:d,t%2?'#1d4ed8':'#e5e7eb');}solid(cx-w/2-3.4,cx+w/2+3.4,cz-d/2-3.4,cz+d/2+3.4,6.6);}
+ for(const [a,b] of[[706,-52],[754,-52],[706,-8],[754,-8]]){B.add(G.cyl,a,0,b,.4,22,.4,'#9aa0aa');B.box(a,22,b,3,1.6,.6,'#f8fafc');lampPos.push(a,22.4,b);}
+ signBoard('NEON ARENA',730,9.5,-6.2,Math.PI,12,2,'#0f172a','#38bdf8','#38bdf8');}
+// --- Skyline Mall + parking ---
+{shopBuilding(790,22,40,22,9,'#eef0f3','#ef4444',-1);signBoard('SKYLINE MALL',790,10.4,10.6,Math.PI,14,2.2,'#ef4444','#ffffff','#ffffff');
+ parkingLines(PT,770,810,40,48,4.5);}
+// --- outer districts: hospital, gas station, apartments, park ---
+{const x=850,z=-92;B.box(x,0,z,26,22,20,'#f8fafc');for(let y=3;y<21;y+=3.4)GB.box(x,y,z-10.05,24,1.8,.2,'#9fd8ff');B.box(x,22,z,27,.6,21,'#cbd5e1');helipad(PT,x,z);
+ B.box(x,8,z-10.4,1.6,5,.3,'#ef4444');B.box(x,9.7,z-10.4,5,1.6,.3,'#ef4444');solid(x-13,x+13,z-10,z+10,22.6);signBoard('NEON GENERAL HOSPITAL',x,24,z-10.3,Math.PI,14,1.8,'#ffffff','#ef4444','#ef4444');}
+{const x=660,z=92;lotPaint(PT,646,78,676,108,'#7b7f88');B.box(x,5.2,z,18,.6,12,'#f59e0b');for(const [a,b] of[[-7,-4],[7,-4],[-7,4],[7,4]])B.add(G.cyl,x+a,0,z+b,.3,5.2,.3,'#e5e7eb');
+ for(const a of[-4,0,4]){B.box(x+a,0,z,1,1.6,.7,'#ef4444');solid(x+a-.5,x+a+.5,z-.35,z+.35,1.6);}B.box(x+12,0,z+10,8,4,6,'#f1f5f9');solid(x+8,x+16,z+7,z+13,4);signBoard('FUEL',x,6.6,z-6.1,Math.PI,5,1,'#f59e0b','#111111','#111111');}
+for(const [x,z,h,c] of[[850,90,46,'#d9dde3'],[838,108,30,'#e8a87c'],[866,72,34,'#9fd3e6'],[656,-96,28,'#c8c3ff'],[850,-40,26,'#f6f1c7'],[850,40,34,'#cfd6dd']])tower(x,z,12,12,h,c);
+for(let k=0;k<40;k++){const x=rnd(648,690),z=rnd(-112,-70);if(Math.hypot(x-656,z+96)<10)continue;tree(x,z);}
+for(let k=0;k<30;k++){const x=rnd(648,870),z=rnd(-114,114);if(x>690&&x<830&&z>-70&&z<70)continue;if(NEON.rx.some(r=>Math.abs(x-r)<11)||NEON.rz.some(r=>Math.abs(z-r)<11))continue;if(boxes.some(b=>x>b.x0-3&&x<b.x1+3&&z>b.z0-3&&z<b.z1+3))continue;palm(x,z);}
+for(const r of NEON.rx)for(let t=-40;t<=40;t+=40)lamp(r+7.4,t+20,0);
+for(const r of NEON.rz)for(let t=710;t<=810;t+=50)lamp(t,r-7.4,Math.PI/2);
+islandMeshes.push({isl:NEON,b:B,pt:PT});
 
 /* ---- Redwood Peaks: mountain island ---- */
 {const N=180,S=MTN.h*2;const geo=new THREE.PlaneGeometry(S,S,N,N).rotateX(-Math.PI/2);const pos=geo.attributes.position,cols=new Float32Array(pos.count*3);const c=new THREE.Color();
@@ -2006,7 +2042,7 @@ function vipVilla(){const S=VILLA,ca=Math.cos(S.ry),sa=Math.sin(S.ry);const W=(X
  ld.load('m/vip.glb?v=18',g=>{const s=g.scene;s.position.set(S.x,S.y,S.z);s.rotation.y=S.ry;s.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;const ms=Array.isArray(o.material)?o.material:[o.material];
    ms.forEach(m=>{if(m.isMeshStandardMaterial){m.envMap=envTex;m.envMapIntensity=m.name==='pool'?1.4:.6;if(m.name==='glass'||m.name==='pool')m.depthWrite=false;}});});scene.add(s);VILLA.model=s;},undefined,e=>console.warn('villa model',e));
  signBoard('VIP VILLA',55,3.6,453.9,Math.PI,6,1.1,'#111214','#d4af37','#d4af37');}
-if(!CITY_MODE){loftHouse(LOFT);estateGate();vipVilla();}
+if(!CITY_MODE){loftHouse(LOFT);estateGate();}
 {const _u=update;update=function(dt){_u(dt);updGate(dt);};}
 
 /* ================= cash ================= */
@@ -3085,7 +3121,7 @@ function update(dt){clock+=dt;if(CITY_MODE)cityCull();updIncome(dt);updGarage(dt
   if(c.mode==='wreck'){c.smoke-=dt;if(c.smoke>0&&Math.random()<dt*10)emit(c.x+rnd(-.5,.5),c.y+1.5,c.z+rnd(-.5,.5),{c:c.smoke>9?'#ff8a2a':'#4a4a4a',life:1.6,s0:1,s1:4,spread:.6,vy:3,a:.6,add:c.smoke>9});}}
  for(const h of helis)if(h!==P.heli&&h.mode!=='crash')updHeli(h,dt,{f:0,t:0,l:0});
  for(const p of planes)if(p!==P.plane&&p.mode!=='parked')updPlane(p,dt,{thr:0,turn:0,pitch:0});
- for(let i=0;i<cars.length;i++){const a=cars[i];if(a.sunk)continue;for(let j=i+1;j<cars.length;j++){const b=cars[j];if(b.sunk)continue;const dx=b.x-a.x,dz=b.z-a.z;if(dx*dx+dz*dz>40)continue;if(Math.abs(a.y-b.y)>1.6)continue;
+ for(let i=0;i<cars.length;i++){const a=cars[i];if(a.sunk)continue;for(let j=i+1;j<cars.length;j++){const b=cars[j];if(b.sunk)continue;if(typeof SEC!=='undefined'&&SEC.state==='escort'&&(a.escort!==undefined||b.escort!==undefined))continue;const dx=b.x-a.x,dz=b.z-a.z;if(dx*dx+dz*dz>40)continue;if(Math.abs(a.y-b.y)>1.6)continue;
   const ao=a.m.T.l*.28,bo=b.m.T.l*.28,ar=a.m.T.bike?.55:1.0,br=b.m.T.bike?.55:1.0,afx=Math.sin(a.h),afz=Math.cos(a.h),bfx=Math.sin(b.h),bfz=Math.cos(b.h);
   for(const sa of[1,-1])for(const sb of[1,-1]){const ax=a.x+afx*ao*sa,az=a.z+afz*ao*sa,bx_=b.x+bfx*bo*sb,bz=b.z+bfz*bo*sb;const ddx=bx_-ax,ddz=bz-az,d=Math.hypot(ddx,ddz),rs=ar+br;
    if(d<rs&&d>.001){const nx=ddx/d,nz=ddz/d,p=(rs-d)/2;a.x-=nx*p;a.z-=nz*p;b.x+=nx*p;b.z+=nz*p;
@@ -3365,7 +3401,7 @@ function realizePlane(p){const pr=MODELS.car[p.mk];const m=p.m;if(!pr||m.real)re
 function addHeli2(mk,x,z,yaw,y){const h=addHeli(x,z,yaw,'#2b2f36','skylark','#111111');h.mk=mk;if(y){h.y=h.home.y=y;}if(MODELS.ready)realizeHeli(h);return h;}
 {const _rh=realizeHeli;realizeHeli=function(h){if(!h.mk)return _rh(h);const pr=MODELS.car[h.mk];const m=h.m;if(!pr||m.real)return;
  const inst=pr.scene.clone(true);const keep=new Set([m.pilot.root,m.interior]);for(const c of m.body.children)if(!keep.has(c))c.visible=false;
- inst.traverse(o=>{if(o.isMesh){o.userData.heli=h;o.castShadow=true;}});m.body.add(inst);m.real=inst;
+ inst.traverse(o=>{if(o.isMesh){o.userData.heli=h;o.castShadow=true;const n=o.material.name||'';if(n==='paint'){o.material=o.material.clone();o.material.color.set(h.col||'#f4f4f2');o.material.metalness=.55;o.material.roughness=.22;}else if(n==='GTA_Mtl.001'&&h.acc){o.material=o.material.clone();o.material.color.set(h.acc);o.material.metalness=.9;o.material.roughness=.25;}else if(/^glass/.test(n)){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.78;o.material.depthWrite=false;o.material.metalness=.8;o.material.roughness=.06;}}});m.body.add(inst);m.real=inst;
  let rm=null,rt=null;inst.traverse(o=>{if(o.name==='rotor-main')rm=o;if(o.name==='rotor-tail')rt=o;});m.rotor0=m.rotor;if(rm)m.rotor=rm;if(rt){m.tail=new THREE.Group();m.tailNode=rt;}
  const s=HELI_MODELS[h.mk];m.eye=s.eye;m.seat=s.eye;m.pilot.root.position.set(s.eye[0],s.eye[1]-1.6,s.eye[2]+.1);m.pilot.root.scale.setScalar(1);h.spec=s;};}
 
@@ -3426,12 +3462,12 @@ function v20Tick(dt){
 addPlane2('f16',400,492,0);addPlane2('rafale',450,492,0);addPlane2('su57',500,491,0);addPlane2('bizjet',560,490,0);
 addPlane2('f16',362,520,Math.PI/2);
 // attack + civil helicopters
-addHeli2('comanche',412,400,Math.PI);addHeli2('t129',448,400,Math.PI);addHeli2('maverick',512,400,Math.PI);addHeli2('policeheli',548,400,Math.PI);
+addHeli2('comanche',412,400,Math.PI);addHeli2('t129',448,400,Math.PI);addHeli2('maverick',512,400,Math.PI);helis[helis.length-1].col='#f4f4f2';helis[helis.length-1].acc='#c1121f';addHeli2('policeheli',548,400,Math.PI);
 // give the old helicopters their own models instead of all being the same Huey
 helis[0].mk='policeheli';helis[2].mk='maverick';helis[3].mk='maverick';
 // cars
 addCar('cybertruck',400,343,0,'parked','#c9ccd1');addCar('revuelto',412,343,0,'parked','#f2c200');addCar('skyline',424,343,0,'parked','#1d4ed8');addCar('koenigsegg',436,343,0,'parked','#f4f4f2');
-addCar('koenigsegg',82,451.8,-Math.PI/2,'parked','#111111');addCar('revuelto',88,451.8,-Math.PI/2,'parked','#2fbf3a');
+addCar('koenigsegg',40,457.6,Math.PI/2,'parked','#111111');addCar('revuelto',46.5,457.6,Math.PI/2,'parked','#2fbf3a');
 addCar('skyline',-380,98,0,'parked','#c1121f');addCar('cybertruck',-372,98,0,'parked','#c9ccd1');addCar('revuelto',-364,98,0,'parked','#ff6a00');
 PLACES.push({name:'Fort Blockade air base (fighter jets)',icon:'✈',col:'#ef4444',x:450,z:480},{name:'Attack helicopters (Fort Blockade)',icon:'H',col:'#ef4444',x:430,z:400});
 
@@ -3444,6 +3480,71 @@ PLACES.push({name:'Fort Blockade air base (fighter jets)',icon:'✈',col:'#ef444
  for(const h of helis)if(h.mk&&!h.m.real){if(!MODELS.car[h.mk])h.mk=null;realizeHeli(h);humanizeSeated(h.m.pilot,ME_LOOK,false);}
  for(const p of planes)if(p.v20){realizePlane(p);humanizeSeated(p.m.pilot,ME_LOOK,false);}
  setTimeout(()=>toast('Fighter jets & attack helicopters ready at Fort Blockade'),2500);})();
+
+/* =====================================================================
+   v21 — VIP security detail: 2 guards at the estate gate, 2 escort SUVs
+   (one ahead, one behind) while you drive, guards walk with you on foot
+   ===================================================================== */
+const SEC={state:'idle',posts:[{x:49.2,z:446.6},{x:62.8,z:446.6}],park:[{x:40,z:443.2,h:Math.PI/2},{x:72,z:443.2,h:-Math.PI/2}],guards:[],cars:[],trail:[],lastCar:null,hint:0};
+function secGuard(i){const m=makeHuman({shirt:'#111214',pants:'#111214',skin:'#8d5524',shades:true,hair:'#111111'});scene.add(m.root);
+ const g={m,i,x:SEC.posts[i].x,z:SEC.posts[i].z,y:0,h:Math.PI,spd:0,inCar:false};m.root.position.set(g.x,0,g.z);m.root.rotation.y=g.h;return g;}
+function secInit(){for(let i=0;i<2;i++){SEC.guards.push(secGuard(i));const p=SEC.park[i];const c=addCar('terra',p.x,p.z,p.h,'parked','#0b0b0d');c.escort=i;c.m.T=Object.assign({},c.m.T,{name:'Security SUV'});SEC.cars.push(c);}}
+secInit();
+function secHumanize(){for(const g of SEC.guards)if(!g.m.real){humanize(g.m,MODELS.hum.length>2?2:0,{shirt:'#111214',pants:'#111214'});if(g.m.mixer)setAct(g.m,'idle',0);}
+ for(const c of SEC.cars){if(!c.m.driver){addDriver(c);if(c.m.driver)c.m.driver.root.visible=false;}}}
+// escort cars must not be stolen-by-physics while escorting, and can't be driven by the player
+{const _nc=nearestCar;nearestCar=function(r){const c=_nc(r);if(c&&c.escort!==undefined&&SEC.state==='escort')return null;return c;};}
+{const _cp=carPhysics;carPhysics=function(c,dt,a,b,h){if(c.escort!==undefined&&SEC.state==='escort'&&c!==P.car&&c.mode!=='wreck'){escortMove(c,dt);animCarModel(c,dt);if(c.m.driver)c.m.driver.root.visible=true;return;}_cp(c,dt,a,b,h);};}
+const _sv=new THREE.Vector3();
+function escortTarget(c,pc){const fx=Math.sin(pc.h),fz=Math.cos(pc.h),spd=Math.max(Math.abs(pc.vf||0),SEC.ps||0);
+ if(c.escort===0){const lead=11+spd*.35;return{x:pc.x+fx*lead,z:pc.z+fz*lead};}
+ // rear car follows the breadcrumb trail ~11 m behind
+ let need=10+spd*.3,acc=0,px=pc.x,pz=pc.z;for(let i=SEC.trail.length-1;i>=0;i--){const t=SEC.trail[i];acc+=Math.hypot(t.x-px,t.z-pz);px=t.x;pz=t.z;if(acc>=need)return{x:t.x,z:t.z};}
+ return{x:pc.x-fx*need,z:pc.z-fz*need};}
+function escortMove(c,dt){const pc=P.car;if(!pc){c.vf=0;return;}const t=escortTarget(c,pc);const dx=t.x-c.x,dz=t.z-c.z,d=Math.hypot(dx,dz);
+ // way too far (e.g. you swapped cars across the map): jump in behind you, out of sight
+ if(d>90){const fx=Math.sin(pc.h),fz=Math.cos(pc.h),k=c.escort===0?14:-14;c.x=pc.x+fx*k;c.z=pc.z+fz*k;c.h=pc.h;c.vf=0;}
+ else{const pspd=Math.max(Math.abs(pc.vf||0),SEC.ps||0),maxV=Math.max(pspd*1.3+8,16);const v=Math.min(maxV,d*2.2);c.vf=d>.4?v:0;
+  if(d>.4){const step=Math.min(d,v*dt);c.x+=dx/d*step;c.z+=dz/d*step;const want=Math.atan2(dx,dz);const back=Math.cos(want-pc.h)<-.3&&d<6;c.h+=angDiff(c.h,back?pc.h:want)*Math.min(1,dt*5);}
+  else c.h+=angDiff(c.h,pc.h)*Math.min(1,dt*3);}
+ // keep escorts off each other / off the player
+ c.hp=Math.max(c.hp,80);for(const o of[pc,...SEC.cars]){if(o===c)continue;const ox=c.x-o.x,oz=c.z-o.z,od=Math.hypot(ox,oz),R=o===pc?4.6:5;if(od<R&&od>.01){c.x+=ox/od*(R-od)*.6;c.z+=oz/od*(R-od)*.6;}}
+ const g=floorAt(c.x,c.z,c.y+1);c.y=lerp(c.y,Math.max(g,-.3),Math.min(1,dt*10));c.vx=Math.sin(c.h)*c.vf;c.vz=Math.cos(c.h)*c.vf;c.steer=0;
+ c.m.g.position.set(c.x,c.y,c.z);c.m.g.rotation.y=c.h;}
+function secGuardsTo(inCar){for(const g of SEC.guards){g.inCar=inCar;g.m.root.visible=!inCar;}for(const c of SEC.cars)if(c.m.driver)c.m.driver.root.visible=inCar;}
+function guardStep(g,tx,tz,face,dt,run){const dx=tx-g.x,dz=tz-g.z,d=Math.hypot(dx,dz);let v=0;
+ if(d>.35){v=Math.min(run?6.2:(d>4?4.6:1.6),d*2.2);if(d>45){g.x=tx-dx/d*2;g.z=tz-dz/d*2;}else{g.x+=dx/d*v*dt;g.z+=dz/d*v*dt;}g.h+=angDiff(g.h,Math.atan2(dx,dz))*Math.min(1,dt*8);}
+ else if(face!==undefined)g.h+=angDiff(g.h,face)*Math.min(1,dt*4);
+ const o={x:g.x,z:g.z};collideCircle(o,.4,0);g.x=o.x;g.z=o.z;g.y=floorAt(g.x,g.z,g.y+1);
+ const m=g.m;m.root.position.set(g.x,g.y,g.z);m.root.rotation.y=g.h;g.spd=lerp(g.spd,v,Math.min(1,dt*6));
+ if(m.mixer){setAct(m,g.spd<.3?'idle':g.spd<3.4?'walk':'run',.2);if(m.act.walk)m.act.walk.timeScale=Math.max(.6,g.spd/1.35);if(m.act.run)m.act.run.timeScale=Math.max(.8,g.spd/5.6);m.mixer.update(dt);}
+ else{const s=Math.sin(clock*9)*Math.min(1,g.spd/2)*.6;m.legL.rotation.x=s;m.legR.rotation.x=-s;m.armL.rotation.x=-s;m.armR.rotation.x=s;}}
+function nearEstate(o,r){return Math.hypot(o.x-VIP.x,o.z-VIP.z)<r;}
+function secTick(dt){if(!SEC.guards.length)return;if(MODELS.ready&&!SEC.hum){SEC.hum=1;secHumanize();}
+ const pc=P.car,isEsc=pc&&pc.escort!==undefined;if(pc){SEC.ps=SEC.lc===pc&&dt>0?lerp(SEC.ps||0,Math.hypot(pc.x-SEC.lx,pc.z-SEC.lz)/dt,.3):0;SEC.lx=pc.x;SEC.lz=pc.z;SEC.lc=pc;}
+ // record the player's car path for the rear escort
+ if(pc&&!isEsc){const l=SEC.trail[SEC.trail.length-1];if(!l||Math.hypot(l.x-pc.x,l.z-pc.z)>1.2){SEC.trail.push({x:pc.x,z:pc.z});if(SEC.trail.length>80)SEC.trail.shift();}}
+ if(SEC.state==='idle'){
+  for(const g of SEC.guards){const p=SEC.posts[g.i];guardStep(g,p.x,p.z,Math.PI,dt,false);}
+  if(pc&&!isEsc&&nearEstate(pc,75)){SEC.state='escort';SEC.trail=[];secGuardsTo(true);for(const c of SEC.cars){c.mode='escortcar';}toast('Security is rolling with you');}
+  else if(!pc&&!P.heli&&!P.plane&&nearEstate(P,22)&&clock>SEC.hint){SEC.hint=clock+60;toast('Get in a car and your security detail will escort you');}}
+ else if(SEC.state==='escort'){
+  if(!pc){if(P.heli||P.plane){SEC.state='standby';for(const c of SEC.cars){c.mode='parked';c.vf=0;}return;}
+   // you got out: guards climb out of their SUVs and walk with you
+   SEC.state='foot';for(const c of SEC.cars){c.mode='parked';c.vf=c.vx=c.vz=0;}
+   SEC.guards.forEach((g,i)=>{const c=SEC.cars[i];const lx=Math.cos(c.h),lz=-Math.sin(c.h);g.x=c.x+lx*2.2;g.z=c.z+lz*2.2;g.h=c.h+Math.PI/2;g.spd=0;});secGuardsTo(false);}}
+ else if(SEC.state==='foot'||SEC.state==='standby'){
+  if(SEC.state==='standby'){if(pc&&!isEsc){SEC.state='escort';secGuardsTo(true);for(const c of SEC.cars)c.mode='escortcar';}return;}
+  if(pc&&!isEsc){SEC.state='escort';SEC.trail=[];secGuardsTo(true);for(const c of SEC.cars)c.mode='escortcar';return;}
+  if(P.heli||P.plane){SEC.state='standby';return;}
+  // flank the player: one each side, a step behind
+  const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),lx=-fz,lz=fx;const run=Math.hypot(P.mvx||0,P.mvz||0)>3.5;
+  SEC.guards.forEach((g,i)=>{const s=i?1:-1;guardStep(g,P.x+lx*s*1.7-fx*1.6,P.z+lz*s*1.7-fz*1.6,Math.atan2(fx,fz),dt,run);g.y=Math.max(g.y,P.y-.05);g.m.root.position.y=g.y;});
+  // walk back home with them and they return to their posts
+  if(nearEstate(P,14)&&!pc){SEC.state='idle';for(let i=0;i<2;i++){const c=SEC.cars[i],p=SEC.park[i];Object.assign(c,{x:p.x,z:p.z,h:p.h,vf:0,vx:0,vz:0,mode:'parked'});c.m.g.position.set(p.x,0,p.z);c.m.g.rotation.y=p.h;}toast('Security back on the gate');}}}
+{const _u=update;update=function(dt){_u(dt);secTick(dt);};}
+// cars the escorts drive are parked again (not "stolen") — keep them out of the sell / wanted logic
+PLACES.push({name:'Neon Heights (casino, arena, mall)',icon:'N',col:'#a855f7',x:730,z:0},{name:'VIP security detail (estate gate)',icon:'S',col:'#d4af37',x:56,z:444});
 
 requestAnimationFrame(loop);
 </script>
