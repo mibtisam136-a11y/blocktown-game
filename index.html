@@ -3546,6 +3546,112 @@ function secTick(dt){if(!SEC.guards.length)return;if(MODELS.ready&&!SEC.hum){SEC
 // cars the escorts drive are parked again (not "stolen") — keep them out of the sell / wanted logic
 PLACES.push({name:'Neon Heights (casino, arena, mall)',icon:'N',col:'#a855f7',x:730,z:0},{name:'VIP security detail (estate gate)',icon:'S',col:'#d4af37',x:56,z:444});
 
+/* =====================================================================
+   v22 — aircraft carrier, elite security (suits, guns, more guards),
+   police that actually chase, upgraded guns, unlimited money
+   ===================================================================== */
+// ---------- unlimited money + all guns ----------
+money=Math.max(money,999999999);
+pay=function(v){money=999999999;save();return true;};
+Object.assign(WEAPONS[1],{name:'Golden Deagle',rate:.2,dmg:95,spread:.008,desc:'Gold-plated hand cannon. Drops anyone in one or two shots.'});
+Object.assign(WEAPONS[2],{name:'Combat Shotgun',rate:.5,dmg:34,pellets:10,spread:.065,desc:'Semi-auto, ten pellets, wrecks cars up close.'});
+Object.assign(WEAPONS[3],{name:'Assault Rifle MK2',rate:.07,dmg:46,spread:.016,desc:'Faster, harder hitting, tighter spread. Hold to fire.'});
+Object.assign(WEAPONS[4],{name:'RPG MK2',rate:.55,rank:0,desc:'Reloads twice as fast. Cars and helicopters don’t stand a chance.'});
+for(const i of[1,2,3,4])if(!SAVE.owned.includes(i))SAVE.owned.push(i);save();
+
+// ---------- police chase is back on when you are wanted ----------
+// (cops spawn near you once you have stars; your security fights them)
+{const _uw=updWanted;updWanted=function(dt){_uw(dt);if(stars<=0||CITY_MODE)return;const focus=P.plane||P.heli||P.car||P;const I=islandAt(focus.x,focus.z);if(!I)return;
+ const cops=cars.filter(c=>c.mode==='police'&&!c.sunk);SEC.copT=(SEC.copT||0)-dt;
+ if(cops.length<Math.min(stars,3)&&SEC.copT<=0){SEC.copT=6;const c=addCar('police',0,0,0,'police',null,I);spawnTraffic(c,I,focus);try{nearestNodeRoute(c);}catch(e){}}};}
+
+// ---------- security: suits, shades, gold, rifles ----------
+const SUIT={shirt:'#101012',pants:'#101012'};
+const accM={black:new THREE.MeshStandardMaterial({color:'#050506',metalness:.9,roughness:.08}),gold:new THREE.MeshStandardMaterial({color:'#d4af37',metalness:1,roughness:.22}),
+ white:new THREE.MeshStandardMaterial({color:'#f4f4f2',roughness:.5}),tie:new THREE.MeshStandardMaterial({color:'#0a0a0b',roughness:.35,metalness:.3})};
+function boneHolder(g,key,root){const B=bonesByKey(g.m.real);const bone=B[key];if(!bone)return null;g.m.root.updateMatrixWorld(true);const ws=new THREE.Vector3();bone.getWorldScale(ws);
+ const h=new THREE.Group();h.scale.setScalar(1/ws.x);const qb=new THREE.Quaternion();bone.getWorldQuaternion(qb);const qr=new THREE.Quaternion();g.m.root.getWorldQuaternion(qr);
+ h.quaternion.copy(qb.invert().multiply(qr));bone.add(h);return h;}
+function dressGuard(g){if(!g.m.real||g.dressed)return;g.dressed=true;
+ g.m.real.traverse(o=>{if(!o.isMesh)return;const n=o.material.name||'';
+  if(/Outfit_Top/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#111114');o.material.roughness=.42;o.material.metalness=.15;}
+  else if(/Outfit_Bottom/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#0e0e10');o.material.roughness=.5;}
+  else if(/Footwear/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#050505');o.material.roughness=.15;o.material.metalness=.4;}
+  else if(/Headwear|Beard/.test(n))o.visible=false;});
+ const mk=(geo,mat,x,y,z,p)=>{const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);p.add(o);return o;};
+ const head=boneHolder(g,'Head');if(head){const sh=new THREE.Group();head.add(sh);sh.position.set(0,.085,.095);
+  mk(new THREE.BoxGeometry(.075,.035,.012),accM.black,-.042,0,0,sh);mk(new THREE.BoxGeometry(.075,.035,.012),accM.black,.042,0,0,sh);mk(new THREE.BoxGeometry(.18,.008,.01),accM.gold,0,.02,0,sh);
+  for(const s of[-1,1])mk(new THREE.BoxGeometry(.006,.006,.11),accM.gold,s*.088,.015,-.055,sh);
+  mk(new THREE.SphereGeometry(.014,8,6),accM.black,.085,.04,0,head);mk(new THREE.CylinderGeometry(.003,.003,.12,4),accM.white,.08,-.02,-.02,head);}
+ const chest=boneHolder(g,'Spine2');if(chest){mk(new THREE.BoxGeometry(.09,.16,.01),accM.white,0,.05,.13,chest);mk(new THREE.BoxGeometry(.035,.17,.012),accM.tie,0,.03,.137,chest);
+  mk(new THREE.BoxGeometry(.03,.03,.012),accM.gold,.11,.08,.125,chest);mk(new THREE.BoxGeometry(.05,.012,.012),accM.gold,-.1,.11,.125,chest);}
+ const hand=boneHolder(g,'RightHand');if(hand){const gun=makeGunModel('rifle');const w=new THREE.Group();w.add(gun);w.rotation.set(-1.2,0,0);w.position.set(0,.06,.02);hand.add(w);g.gun=w;}}
+function guardShoot(g,t){const a=new THREE.Vector3(g.x,(g.y||0)+1.45,g.z),b=new THREE.Vector3(t.x+rnd(-.4,.4),t.y+1.1,t.z+rnd(-.4,.4));const d=b.clone().sub(a);const L=d.length();d.normalize();
+ if(rayBoxes(a,d,L)<L-1)return false;a.addScaledVector(d,.7);tracer(a,b,'#ffe08a');flash(a.x,a.y,a.z,1.2,'#ffd27a');if(Math.hypot(g.x-camera.position.x,g.z-camera.position.z)<70)sfx.rifle();
+ t.hp-=9;if(t.hp<=0&&t.mode!=='wreck')explode(t);return true;}
+function hostiles(){return cars.filter(c=>c.mode==='police'&&!c.sunk&&c.mode!=='wreck');}
+function guardCombat(g,dt){g.cd=(g.cd||0)-dt;if(stars<=0)return null;let best=null,bd=55;for(const c of hostiles()){const d=Math.hypot(c.x-g.x,c.z-g.z);if(d<bd){bd=d;best=c;}}
+ if(best&&g.cd<=0){g.cd=rnd(.18,.32);guardShoot(g,best);}return best;}
+// escort guards get dressed + armed once the real models are in
+{const _sh=secHumanize;secHumanize=function(){for(const g of SEC.guards)if(!g.m.real)humanize(g.m,0,SUIT);_sh();for(const g of SEC.guards)dressGuard(g);};}
+// guards on foot fire back; escort SUVs fire from the windows
+{const _gs=guardStep;guardStep=function(g,tx,tz,face,dt,run){const t=guardCombat(g,dt);if(t&&Math.hypot(tx-g.x,tz-g.z)<2)face=Math.atan2(t.x-g.x,t.z-g.z);_gs(g,tx,tz,face,dt,run);};}
+{const _em=escortMove;escortMove=function(c,dt){_em(c,dt);
+ // fix: escorts slide along walls instead of driving through buildings
+ const o={x:c.x,z:c.z};collideCircle(o,1.7,c.y+.2);if(Math.abs(o.x-c.x)+Math.abs(o.z-c.z)>0){c.x=o.x;c.z=o.z;c.m.g.position.set(c.x,c.y,c.z);c.wallT=(c.wallT||0)+dt;}else c.wallT=0;
+ // pinned against a wall for a while -> hop back onto your trail so it never gets stuck
+ if(c.wallT>1.4&&P.car){const t=SEC.trail[Math.max(0,SEC.trail.length-12)];if(t){c.x=t.x;c.z=t.z;c.h=P.car.h;c.wallT=0;c.m.g.position.set(c.x,c.y,c.z);c.m.g.rotation.y=c.h;}}
+ const fake={x:c.x,y:c.y,z:c.z};fake.cd=c.gcd;c.gcd=(c.gcd||0)-dt;if(stars>0&&c.gcd<=0){let best=null,bd=45;for(const h of hostiles()){const d=Math.hypot(h.x-c.x,h.z-c.z);if(d<bd){bd=d;best=h;}}if(best){c.gcd=rnd(.25,.4);guardShoot({x:c.x,y:c.y+.2,z:c.z},best);}}};}
+
+// ---------- 4 more guards posted around the mansion (patrolling) ----------
+const HG=[[[31,466],[31,478]],[[71,457.5],[76,457.5]],[[44,493],[66,493]],[[81,478],[88,478]]].map((pp,i)=>{const m=makeHuman({shirt:'#111214',pants:'#111214',skin:pick(SKIN),shades:true,hair:'#111111'});scene.add(m.root);
+ return{m,pts:pp,k:0,x:pp[0][0],z:pp[0][1],y:0,h:0,spd:0,wait:rnd(0,3),i:10+i};});
+function houseGuards(dt){for(const g of HG){if(MODELS.ready&&!g.m.real){humanize(g.m,0,SUIT);if(g.m.mixer)setAct(g.m,'idle',0);dressGuard(g);}
+ const d=Math.hypot(g.x-P.x,g.z-P.z);g.m.root.visible=d<220;if(!g.m.root.visible)continue;
+ const tgt=guardCombat(g,dt);let p=g.pts[g.k];
+ if(tgt){g.h+=angDiff(g.h,Math.atan2(tgt.x-g.x,tgt.z-g.z))*Math.min(1,dt*8);const m=g.m;m.root.position.set(g.x,g.y,g.z);m.root.rotation.y=g.h;if(m.mixer){setAct(m,'idle',.2);m.mixer.update(dt);}continue;}
+ if(Math.hypot(p[0]-g.x,p[1]-g.z)<.5){g.wait-=dt;if(g.wait<=0){g.k=1-g.k;g.wait=rnd(2,5);}p=null;}
+ if(p){const dx=p[0]-g.x,dz=p[1]-g.z,dd=Math.hypot(dx,dz),v=1.3;g.x+=dx/dd*Math.min(dd,v*dt);g.z+=dz/dd*Math.min(dd,v*dt);g.h+=angDiff(g.h,Math.atan2(dx,dz))*Math.min(1,dt*6);g.spd=v;}else g.spd=0;
+ const m=g.m;m.root.position.set(g.x,g.y,g.z);m.root.rotation.y=g.h;if(m.mixer){setAct(m,g.spd>.2?'walk':'idle',.25);if(m.act.walk)m.act.walk.timeScale=.95;if(d<120)m.mixer.update(dt);}}}
+
+// ---------- USS Blocktown: aircraft carrier ----------
+const CV={x0:300,x1:540,z0:-302,z1:-258,deck:16,cx:420,cz:-280};
+{const CB=new Builder();const {x0,x1,z0,z1,deck}=CV,cz=CV.cz,L=x1-x0,W=z1-z0;
+ CB.box((x0+x1)/2-4,-6,cz,L-8,deck-.6+6,W-10,'#5c636c');CB.add(G.wedge,x1-4,-6,cz,12,deck+5.4,W-10,'#5c636c',0);// hull + bow
+ CB.box((x0+x1)/2,deck-.6,cz,L,.6,W,'#3b3f45');CB.box((x0+x1)/2,-1.2,cz,L-6,1.4,W-8.6,'#8b1e1e');
+ // deck markings
+ for(let x=x0+8;x<x1-6;x+=10)CB.box(x,deck,cz,5,.03,.4,'#f8fafc');for(const s of[-1,1])CB.box((x0+x1)/2,deck,cz+s*(W/2-2.2),L-6,.03,.25,'#f8fafc');
+ CB.box(x0+20,deck,cz,.5,.03,W-6,'#ffd23f');for(let k=0;k<4;k++)CB.box(x0+10+k*1.6,deck,cz,.3,.03,W-10,'#f8fafc');
+ for(const z of[cz-10,cz+10])for(let x=x0+60;x<x1-30;x+=28)CB.box(x,deck,z,14,.03,.18,'#ffd23f');
+ // island superstructure (starboard)
+ const ix=455,iz=z0+4;CB.box(ix,deck,iz,26,10,7,'#7b838c');CB.box(ix-2,deck+10,iz,18,6,6,'#6f7780');CB.box(ix-2,deck+16,iz,12,4,5,'#7b838c');
+ GB.box(ix-2,deck+17,iz+2.55,11,1.6,.2,'#6fb8e6');GB.box(ix,deck+12,iz+3.05,16,1.4,.2,'#6fb8e6');CB.add(G.cyl,ix-2,deck+20,iz,.25,8,.25,'#999999');CB.box(ix-2,deck+24,iz,6,.3,.3,'#999999');
+ CB.add(G.dome,ix+8,deck+10,iz,3,2,3,'#e5e7eb',0,0,0,0);CB.box(ix-2,deck+27.6,iz,.5,.5,.5,'#ff2a2a');lampPos.push(ix-2,deck+28,iz);
+ solid(ix-13,ix+13,iz-3.5,iz+3.5,deck+20);
+ // edge nets / lights
+ for(let x=x0+4;x<x1;x+=12){CB.box(x,deck,z0+.3,.3,.3,.3,'#22c55e');CB.box(x,deck,z1-.3,.3,.3,.3,'#22c55e');lampPos.push(x,deck+.3,z1-.3);}
+ CB.box(x1-1,deck,cz,.4,.4,.4,'#ffffff');
+ const cm=CB.mesh(worldMat);cm.castShadow=true;cm.receiveShadow=true;scene.add(cm);
+ FLOORS.push({x0,x1,z0,z1,h:deck});solid(x0,x1,z0,z1,deck-.8);
+ signBoard('USS BLOCKTOWN',ix,deck+6,iz+3.6,0,10,1.5,'#1f2937','#ffffff','#9ca3af');}
+// planes/helis on the deck must treat the deck as ground
+{const _up=updPlane;updPlane=function(p,dt,c){const _g=groundAt;if(p.onCV||onCarrier(p.x,p.z)){groundAt=(x,z)=>onCarrier(x,z)?CV.deck:_g(x,z);try{_up(p,dt,c);}finally{groundAt=_g;}}else _up(p,dt,c);};}
+function onCarrier(x,z){return x>CV.x0&&x<CV.x1&&z>CV.z0&&z<CV.z1;}
+{const _xp=exitPlane;exitPlane=function(f){const p=P.plane;_xp(f);if(p&&onCarrier(p.x,p.z)&&p.y>CV.deck-1){P.x=p.x+Math.cos(p.yaw)*6;P.z=p.z-Math.sin(p.yaw)*6;if(!onCarrier(P.x,P.z)){P.x=p.x;P.z=clamp(p.z,CV.z0+3,CV.z1-3);}P.y=CV.deck+.2;}};}
+{const _pc=planeCrash;planeCrash=function(p,w){_pc(p,w);if(p.home.y){setTimeout(()=>{p.y=p.home.y;p.m.g.position.y=p.home.y;},15100);}};}
+function deckPlane(kind,x,z,yaw){const p=addPlane2(kind,x,z,yaw);p.y=p.home.y=CV.deck;p.m.g.position.y=CV.deck;p.onCV=true;return p;}
+deckPlane('f16',318,-280,Math.PI/2);deckPlane('rafale',318,-268,Math.PI/2);
+deckPlane('su57',350,-266,Math.PI/2);deckPlane('f16',372,-266,Math.PI/2);deckPlane('rafale',394,-266,Math.PI/2);deckPlane('su57',416,-266,Math.PI/2);deckPlane('bizjet',505,-268,-Math.PI/2);
+addHeli2('comanche',438,-266,0,CV.deck);addHeli2('t129',470,-266,0,CV.deck);addHeli2('maverick',500,-286,0,CV.deck);{const h=helis[helis.length-1];h.col='#5c636c';h.acc='#ffd23f';}
+// ferry: walk into the beam at the Port Bay docks to board, and the one on deck to return
+const FERRY=[{x:470,z:-106,to:{x:334,y:CV.deck+.2,z:-262},label:'Board USS Blocktown'},{x:304,z:-264,y:CV.deck,to:{x:470,y:0,z:-101},label:'Back to Port Bay'}];
+for(const f of FERRY){addPad(f.x,f.z,2,'#38bdf8',f.y||0);const b=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,14,16,1,true),new THREE.MeshBasicMaterial({color:'#38bdf8',transparent:true,opacity:.18,depthWrite:false,side:THREE.DoubleSide}));b.position.set(f.x,(f.y||0)+7,f.z);scene.add(b);}
+let ferryCD=0;function ferryTick(dt){ferryCD-=dt;if(P.car||P.heli||P.plane||ferryCD>0)return;for(const f of FERRY){if(Math.hypot(P.x-f.x,P.z-f.z)<1.8&&Math.abs(P.y-(f.y||0))<2.5){P.x=f.to.x;P.y=f.to.y;P.z=f.to.z;P.vy=0;ferryCD=3;toast(f.label);sfx.click();
+ if(SEC.state==='foot')for(const g of SEC.guards){g.x=P.x+rnd(-2,2);g.z=P.z+2;g.y=P.y;}break;}}}
+PLACES.push({name:'USS Blocktown carrier (board at Port Bay docks)',icon:'⚓',col:'#38bdf8',x:470,z:-106});
+
+{const _u=update;update=function(dt){_u(dt);houseGuards(dt);ferryTick(dt);if(money<999999999)money=999999999;};}
+
 requestAnimationFrame(loop);
 </script>
 
