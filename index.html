@@ -3656,36 +3656,38 @@ PLACES.push({name:'USS Blocktown carrier (board at Port Bay docks)',icon:'⚓',c
    v23 — private jet: full cabin interior, airstairs, uniformed pilot,
    "fly it yourself" or "pilot, fly me" (auto take-off, island tour, auto-landing)
    ===================================================================== */
-PLANE_SPECS.bizjet.eye=[-.45,2.55,8.05];
-const JETC={floor:1.25,ceil:3.45,hw:1.12,z0:-6.2,z1:7.3,door:{x:1.2,z:6.3}};
-function buildJetInterior(){const IB=new Builder(),GLB=new Builder();const {floor:F,ceil:C,hw:W,z0,z1}=JETC;const zc=(z0+z1)/2,L=z1-z0;
- const CREAM='#efe6d2',LEA='#e9dcc0',WAL='#5a3a22',GOLD='#c9a24a',DARK='#1d1f24',CARP='#3a3f4a';
- IB.box(0,F-.06,zc+.9,W*2,.06,L+2,CARP);IB.box(0,C,zc+.9,W*2,.06,L+2,'#f4efe6');
- for(let z=z0+.6;z<z1;z+=1.6)IB.box(0,C-.04,z,.8,.03,.14,'#fff7d6');
- // side walls with real window openings
- for(const s of[-1,1]){const x=s*W;IB.box(x,F,zc,.08,.8,L,CREAM);IB.box(x,F+1.38,zc,.08,C-F-1.38,L,CREAM);IB.box(x-s*.05,F+.78,zc,.08,.06,L,WAL);
-  for(let z=z0+.3;z<z1-.2;z+=1.25){IB.box(x,F+.8,z,.08,.58,.6,CREAM);GLB.box(x+s*.02,F+.8,z+.62,.03,.58,.62,'#bfe3ff');}}
- IB.box(0,F,z0,W*2,C-F,.08,CREAM);IB.box(0,F,z0+.05,.8,2.0,.05,WAL);IB.box(.32,F+1,z0+.09,.05,.05,.03,GOLD);// rear bathroom door
- // club seats facing each other + walnut tables
- const seatAt=(x,z,face)=>{IB.box(x,F,z,.62,.45,.62,LEA);IB.box(x,F+.45,z-face*.27,.62,.72,.12,LEA);IB.box(x,F+1.12,z-face*.27,.4,.18,.12,LEA);for(const a of[-1,1])IB.box(x+a*.33,F+.45,z,.08,.22,.6,LEA);IB.box(x,F+.02,z,.5,.02,.5,GOLD);};
- for(const s of[-1,1]){seatAt(s*.6,4.6,-1);seatAt(s*.6,2.9,1);IB.box(s*.6,F+.62,3.75,.55,.04,.75,WAL);IB.box(s*.6,F,3.75,.08,.62,.08,GOLD);}
- seatAt(-.6,.9,-1);seatAt(-.6,-.8,1);IB.box(-.6,F+.62,.05,.55,.04,.75,WAL);
- // divan sofa (right side) + side console
- IB.box(.72,F,-.2,.6,.42,2.6,LEA);IB.box(.98,F+.42,-.2,.14,.55,2.6,LEA);for(let k=0;k<3;k++)IB.box(.92,F+.62,-1+k*.8,.12,.3,.5,'#d9c9a6');
- IB.box(.75,F,-2.1,.5,.62,1,WAL);IB.box(.75,F+.62,-2.1,.52,.03,1.02,GOLD);
- // aft lounge: two more seats
- seatAt(-.6,-3.2,1);seatAt(.6,-3.2,1);IB.box(0,F,-4.4,1.6,.75,.5,WAL);IB.box(0,F+.75,-4.4,1.62,.04,.52,GOLD);
- // galley / bar + TV bulkhead
- IB.box(-.78,F,6.2,.5,.95,1.4,WAL);IB.box(-.78,F+.95,6.2,.52,.04,1.42,GOLD);IB.box(-.95,F+1.25,6.2,.12,.9,1.3,'#ece4d4');for(let k=0;k<4;k++)IB.box(-.85,F+1.02,5.7+k*.3,.06,.18,.06,'#7fd3e6');
- IB.box(-.55,F,6.95,1.15,C-F,.08,CREAM);IB.box(-.55,F+1.25,6.9,.9,.5,.04,'#0a0c10');
- // cockpit
- IB.box(.62,F,7.6,.06,C-F-.4,.06,DARK);
- for(const s of[-1,1]){const x=s*.45;IB.box(x,F,8.05,.5,.48,.55,'#2b2f36');IB.box(x,F+.48,7.82,.5,.75,.12,'#2b2f36');IB.box(x,F+.05,8.6,.08,.55,.08,DARK);IB.box(x,F+.6,8.6,.36,.05,.05,DARK);}
- IB.box(0,F+.62,9.05,W*1.8,.5,.55,DARK);IB.box(0,F+.25,8.6,.25,.6,.6,DARK);IB.box(0,F,9,W*2,.62,.6,'#2b2f36');
- for(const x of[-.75,-.28,.28,.75])IB.box(x,F+.9,8.83,.36,.26,.02,'#1e3a8a');
- GLB.box(0,F+1.15,9.25,W*1.9,.7,.04,'#bfe3ff');
- const g=new THREE.Group();const im=IB.mesh(new THREE.MeshBasicMaterial({vertexColors:true}));g.add(im);
- const gm=GLB.mesh(new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.22,metalness:.6,roughness:.05,depthWrite:false}));g.add(gm);
+PLANE_SPECS.bizjet.eye=[-.42,2.72,7.62];
+const JETC={floor:1.3,ceil:3.28,hw:.98,z0:-3.0,z1:7.0,door:{x:1.04,z:6.25},rects:[],seats:[]};
+function buildJetInterior(){const IB=new Builder(),GLB=new Builder();const {floor:F,ceil:C,hw:W,z0,z1}=JETC;const zc=(z0+z1)/2,L=z1-z0;JETC.rects=[];JETC.seats=[];
+ const R=(x,z,w,d)=>JETC.rects.push({x0:x-w/2,x1:x+w/2,z0:z-d/2,z1:z+d/2});
+ const CREAM='#efe6d2',LEA='#e7d8b8',WAL='#5a3a22',GOLD='#c9a24a',DARK='#1d1f24',CARP='#3a3f4a',CEIL='#f6f1e7';
+ // shell: floor, curved-ish ceiling (fits inside the fuselage tube), end bulkhead
+ IB.box(0,F-.06,zc+.75,W*2,.06,L+1.5,CARP);IB.box(0,F-.055,zc+.75,.5,.01,L+1.5,'#2a2e37');
+ IB.box(0,C,zc,1.5,.05,L,CEIL);for(const s of[-1,1])IB.add(G.boxc,s*.86,C-.18,zc,.42,.05,L,CEIL,0,0,s*.75,0);
+ for(let z=z0+.8;z<z1;z+=1.4){IB.box(0,C-.03,z,.6,.03,.12,'#fff7d6');}
+ for(const s of[-1,1]){const x=s*W;IB.box(x,F,zc,.06,.7,L,CREAM);IB.box(x,F+1.3,zc,.06,C-.3-F-1.3,L,CREAM);IB.box(x-s*.04,F+.68,zc,.06,.05,L,WAL);
+  for(let z=z0+.45;z<z1-.3;z+=1.1){IB.box(x,F+.7,z,.06,.6,.55,CREAM);GLB.box(x+s*.02,F+.72,z+.55,.02,.55,.55,'#bfe3ff');}}
+ IB.box(0,F,z0,W*2,C-F,.08,CREAM);IB.box(0,F,z0+.05,.75,1.95,.04,WAL);IB.box(.28,F+1,z0+.08,.04,.04,.03,GOLD);
+ const seatAt=(x,z,face)=>{IB.box(x,F,z,.6,.44,.6,LEA);IB.box(x,F+.44,z-face*.26,.6,.7,.12,LEA);IB.box(x,F+1.1,z-face*.26,.38,.16,.12,LEA);for(const a of[-1,1])IB.box(x+a*.32,F+.44,z,.08,.2,.58,LEA);IB.box(x,F+.02,z,.48,.02,.48,GOLD);
+  R(x,z,.66,.66);JETC.seats.push({x,z:z+face*.05,face});};
+ // club four (both sides) with walnut tables
+ for(const s of[-1,1]){seatAt(s*.55,4.7,-1);seatAt(s*.55,3.0,1);IB.box(s*.6,F+.62,3.85,.5,.04,.7,WAL);IB.box(s*.6,F,3.85,.07,.62,.07,GOLD);R(s*.6,3.85,.5,.7);}
+ // mid cabin: single seat + divan sofa
+ seatAt(-.55,1.4,1);IB.box(.7,F,.6,.52,.42,2.2,LEA);IB.box(.9,F+.42,.6,.12,.5,2.2,LEA);for(let k=0;k<3;k++)IB.box(.84,F+.6,-.1+k*.7,.1,.26,.45,'#d6c49e');R(.7,.6,.55,2.2);
+ IB.box(-.72,F,-.2,.4,.6,.8,WAL);IB.box(-.72,F+.6,-.2,.42,.03,.82,GOLD);R(-.72,-.2,.42,.82);
+ // aft lounge
+ seatAt(-.55,-1.6,1);seatAt(.55,-1.6,1);IB.box(0,F,-2.65,1.5,.72,.45,WAL);IB.box(0,F+.72,-2.65,1.52,.04,.47,GOLD);R(0,-2.65,1.5,.45);
+ // galley / bar on the right, door on the left (+x)
+ IB.box(-.72,F,6.2,.5,.95,1.3,WAL);IB.box(-.72,F+.95,6.2,.52,.04,1.32,GOLD);IB.box(-.9,F+1.2,6.2,.1,.8,1.2,'#ece4d4');for(let k=0;k<4;k++)IB.box(-.8,F+1.0,5.75+k*.3,.06,.16,.06,'#7fd3e6');R(-.72,6.2,.52,1.32);
+ IB.box(-.5,F,6.95,.96,C-F-.1,.06,CREAM);IB.box(-.5,F+1.2,6.91,.8,.45,.03,'#0a0c10');R(-.5,6.95,.96,.08);
+ IB.box(1.0,F,6.25,.04,1.9,.9,'#d9d0bd');// door panel
+ // cockpit (narrower nose)
+ for(const s of[-1,1]){const x=s*.42;IB.box(x,F,7.6,.46,.45,.5,'#2b2f36');IB.box(x,F+.45,7.38,.46,.7,.1,'#2b2f36');IB.box(x,F+.05,8.12,.07,.5,.07,DARK);IB.box(x,F+.55,8.12,.32,.05,.05,DARK);R(x,7.55,.5,.6);}
+ IB.box(0,F,8.5,1.5,.95,.45,'#2b2f36');IB.box(0,F+.95,8.45,1.45,.2,.4,DARK);for(const x of[-.5,-.17,.17,.5])IB.box(x,F+.72,8.27,.28,.2,.02,'#1e3a8a');R(0,8.5,1.5,.5);
+ for(const s of[-1,1])IB.box(s*.8,F,7.8,.05,1.6,1.4,'#2b2f36');IB.box(0,F+1.75,7.8,1.6,.05,1.4,'#2b2f36');
+ GLB.box(0,F+1.15,8.72,1.4,.55,.03,'#bfe3ff');
+ const g=new THREE.Group();g.add(IB.mesh(new THREE.MeshBasicMaterial({vertexColors:true})));
+ g.add(GLB.mesh(new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.22,metalness:.6,roughness:.05,depthWrite:false})));
  const lt=new THREE.PointLight('#fff1d6',0,9,2);lt.position.set(0,C-.3,2);g.add(lt);g.userData.light=lt;return g;}
 function buildStairs(){const g=new THREE.Group(),inner=new THREE.Group();g.add(inner);const n=5,h=JETC.floor/n;
  const st=new THREE.MeshStandardMaterial({color:'#e5e7eb',metalness:.5,roughness:.35}),cp=new THREE.MeshLambertMaterial({color:'#7a1f2b'}),rl=new THREE.MeshStandardMaterial({color:'#c9a24a',metalness:.9,roughness:.25});
@@ -3706,11 +3708,11 @@ document.body.appendChild(JCH);
 let jetAsk=null;
 function jetChoose(pilot){const p=jetAsk;JCH.hidden=true;jetAsk=null;if(!p||p.mode!=='parked')return;const J=p.jet;J.stairWant=1;
  if(!pilot){J.boardT=.9;J.boardFn=()=>{p.__direct=true;enterPlane(p);p.__direct=false;};return;}
- J.pilotState='board';J.boardT=1.6;J.boardFn=()=>{p.__direct=true;enterPlane(p);p.__direct=false;p.passenger=true;P.camMode=2;J.pilot.m.root.visible=false;J.ap={phase:'wait',t:1.2,wp:0};setModeUI();toast('Welcome aboard. Sit back — your pilot has it. L = land now · V = camera');};}
+ J.pilotState='board';J.boardT=1.6;J.boardFn=()=>{p.__direct=true;enterPlane(p);p.__direct=false;p.passenger=true;P.camMode=2;J.pilot.m.root.visible=false;J.ap={phase:'wait',t:1.2,wp:0,seated:false};Object.assign(JW,{x:.5,z:5.9,a:Math.PI,pitch:-.05,seat:null,eye:1.62});setModeUI();toast('Welcome aboard! Walk around (WASD), press E at a seat to sit — the pilot takes off once you are seated.');};}
 $('jcSelf').addEventListener('click',e=>{e.stopPropagation();jetChoose(false);});$('jcPilot').addEventListener('click',e=>{e.stopPropagation();jetChoose(true);});
 {const _ep=enterPlane;enterPlane=function(p){if(p.kind==='bizjet'&&p.jet&&!p.__direct){if(jetAsk===p){jetChoose(false);return;}jetAsk=p;JCH.hidden=false;p.jet.stairWant=1;return;}_ep(p);if(p.kind==='bizjet'&&p.jet){p.jet.stairWant=0;p.jet.pilot.m.root.visible=false;}};}
 {const _ck=cockKind;cockKind=function(veh){if(veh.passenger)return null;return _ck(veh);};}
-{const _xp=exitPlane;exitPlane=function(f){const p=P.plane;if(p&&p.kind==='bizjet'&&p.jet&&!f&&p.speed>8){toast(p.passenger?'Wait until the pilot has stopped':'Slow down to get out');return;}
+{const _xp=exitPlane;exitPlane=function(f){const p=P.plane;if(!f&&p&&p.passenger&&p.jet&&jetCabinE(p))return;if(p&&p.kind==='bizjet'&&p.jet&&!f&&p.speed>8){toast(p.passenger?'Wait until the pilot has stopped':'Slow down to get out');return;}
  _xp(f);if(!p||p.kind!=='bizjet'||!p.jet||P.plane)return;const J=p.jet;J.stairWant=1;J.stairT=1;const v=jetDoorWorld(p,2.6);P.x=v.x;P.z=v.z;P.y=floorAt(v.x,v.z,(p.y||0)+.5)+.05;P.yaw=p.yaw-Math.PI/2;
  const was=p.passenger;p.passenger=false;J.ap=null;jetPilotHome(p);if(was)toast('Thanks for flying Blocktown Private');P.camMode=0;};}
 // ---- autopilot ----
@@ -3723,7 +3725,7 @@ function apFly(p,dt,tx,tz,alt,thr){const S=p.spec;const want=headTo(p,tx,tz);con
 function autopilot(p,dt){const A=p.jet.ap,S=p.spec;const onG=p.y<=Math.max(groundAt(p.x,p.z),-.6)+.3;
  if(pressed.has('KeyL')||IN.land){if(A.phase==='tour'||A.phase==='climb'){A.phase='approach';A.rw=nearestRunway(p.x,p.z);toast('Pilot: heading in to land at '+A.rw.name);}}
  switch(A.phase){
- case 'wait':A.t-=dt;if(A.t<=0){A.rw0=nearestRunway(p.x,p.z);A.phase=onCarrier(p.x,p.z)?'roll':'taxi';}return{thr:0,turn:0,pitch:0};
+ case 'wait':if(!A.seated)return{thr:-1,turn:0,pitch:0};A.t-=dt;if(A.t<=0){A.rw0=nearestRunway(p.x,p.z);A.phase=onCarrier(p.x,p.z)?'roll':'taxi';}return{thr:0,turn:0,pitch:0};
  case 'taxi':{const e=A.rw0.entry,d=Math.hypot(e.x-p.x,e.z-p.z);p.yaw+=angDiff(p.yaw,headTo(p,e.x,e.z))*Math.min(1,dt*1.6);p.speed=lerp(p.speed,Math.min(9,d*.8+2),dt*2);if(d<4){A.phase='lineup';}return{thr:0,turn:0,pitch:0};}
  case 'lineup':{const td=A.rw0.to||{x:-A.rw0.dir.x,z:-A.rw0.dir.z};const w=Math.atan2(td.x,td.z);p.yaw+=angDiff(p.yaw,w)*Math.min(1,dt*2);p.speed=lerp(p.speed,3,dt*2);if(Math.abs(angDiff(p.yaw,w))<.03){p.yaw=w;A.phase='roll';toast('Pilot: cleared for take-off');}return{thr:0,turn:0,pitch:0};}
  case 'roll':{p.thr=1;if(!onG&&p.y>Math.max(groundAt(p.x,p.z),0)+4){A.phase='climb';}if(p.speed>S.vr*1.08)return{thr:1,turn:0,pitch:p.pitch<.16?1:0};return{thr:1,turn:0,pitch:0};}
@@ -3741,7 +3743,7 @@ function autopilot(p,dt){const A=p.jet.ap,S=p.spec;const onG=p.y<=Math.max(groun
 function jetTick(dt){for(const p of planes){if(p.kind!=='bizjet'||!p.m.real)continue;jetSetup(p);const J=p.jet;
   if(J.boardT>0){J.boardT-=dt;if(J.boardT<=0&&J.boardFn){const f=J.boardFn;J.boardFn=null;f();}}
   const want=(p.mode==='parked'||J.boardT>0||(J.ap&&J.ap.phase==='parked'))?J.stairWant:0;J.stairT=clamp(J.stairT+(want?1:-1)*dt*1.4,0,1);
-  J.stairs.rotation.z=(1-J.stairT)*1.55;J.stairs.visible=J.stairT>.02||p.mode==='parked';
+  J.stairs.rotation.z=(1-J.stairT)*1.55;J.stairs.visible=J.stairT>.02;if(!J.uni&&p.m.pilot.real){J.uni=1;p.m.pilot.real.traverse(o=>{if(!o.isMesh)return;const n=o.material.name||'';if(/Outfit_Top/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#f8fafc');}else if(/Outfit_Bottom/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#0f172a');}else if(/Headwear/.test(n)){o.visible=true;o.material=o.material.clone();o.material.color.set('#0f172a');}});}
   const pl=J.pilot,d=Math.hypot(pl.x-camera.position.x,pl.z-camera.position.z);
   if(J.pilotState==='board'){const v=jetDoorWorld(p,0);const dx=v.x-pl.x,dz=v.z-pl.z,dd=Math.hypot(dx,dz);if(dd>.3){pl.x+=dx/dd*Math.min(dd,2.4*dt);pl.z+=dz/dd*Math.min(dd,2.4*dt);pl.h=Math.atan2(dx,dz);pl.spd=2.4;pl.y=lerp(pl.y,(p.y||0)+JETC.floor*(1-Math.min(1,dd/3)),.2);}else{pl.m.root.visible=false;J.pilotState='aboard';}}
   else pl.spd=0;
@@ -3750,8 +3752,8 @@ function jetTick(dt){for(const p of planes){if(p.kind!=='bizjet'||!p.m.real)cont
   J.interior.visible=Math.hypot(p.x-camera.position.x,p.z-camera.position.z)<60;J.interior.userData.light.intensity=(P.plane===p&&p.passenger)?.9:0;
   if(jetAsk===p&&Math.hypot(P.x-p.x,P.z-p.z)>16){JCH.hidden=true;jetAsk=null;J.stairWant=0;}}}
 {const _uc=updateCamera;updateCamera=function(dt){_uc(dt);const p=P.plane;if(!p||!p.passenger||!p.jet)return;
- if(P.camMode===2){const m=p.m;if(m.real)m.real.visible=false;m.pilot.root.visible=true;const v=new THREE.Vector3(-.6,JETC.floor+1.12,2.98);m.g.updateMatrixWorld(true);m.body.localToWorld(v);
-  const q=new THREE.Quaternion();m.body.getWorldQuaternion(q);camera.position.copy(v);camera.quaternion.copy(q);camera.rotateY(Math.PI+camOrbit);camera.rotateX(-.05+camPitchI);
+ if(P.camMode===2){const m=p.m;if(m.real)m.real.visible=false;m.pilot.root.visible=true;JW.eye=lerp(JW.eye,JW.seat?1.12:1.62,Math.min(1,dt*6));const v=new THREE.Vector3(JW.x,JETC.floor+JW.eye,JW.z);m.g.updateMatrixWorld(true);m.body.localToWorld(v);
+  const q=new THREE.Quaternion();m.body.getWorldQuaternion(q);camera.position.copy(v);camera.quaternion.copy(q);camera.rotateY(Math.PI+JW.a);camera.rotateX(JW.pitch);
   if(Math.abs(camera.fov-75)>.1){camera.fov=lerp(camera.fov,75,.2);camera.updateProjectionMatrix();}}
  else if(p.m.real)p.m.real.visible=true;};}
 {const _u=update;update=function(dt){_u(dt);jetTick(dt);if(jetAsk&&!P.car&&!P.plane&&!P.heli&&gameState==='play'){if(pressed.has('KeyT'))jetChoose(true);}};}
@@ -3761,6 +3763,22 @@ function jetTick(dt){for(const p of planes){if(p.kind!=='bizjet'||!p.m.real)cont
 {const b=document.createElement('button');b.className='outl sm';b.dataset.k='land';b.textContent='LAND';b.id='bLand';b.hidden=true;const pad=$('planeR');if(pad)pad.prepend(b);
  b.addEventListener('pointerdown',e=>{e.preventDefault();IN.land=true;setTimeout(()=>IN.land=false,300);});}
 {const _sm=setModeUI;setModeUI=function(){_sm();const b=$('bLand');if(b)b.hidden=!(P.plane&&P.plane.passenger);};}
+
+// ---- walking around the cabin (works parked and in flight) ----
+const JW={x:.5,z:5.9,a:Math.PI,pitch:-.05,seat:null,eye:1.62};
+function jetInCabin(){const p=P.plane;return !!(p&&p.passenger&&p.jet&&P.camMode===2);}
+{const _lk=look;look=function(dx,dy){if(jetInCabin()){JW.a-=dx*1.1;JW.pitch=clamp(JW.pitch-dy*1.1,-1.2,1.1);return;}_lk(dx,dy);};}
+function jetWalk(dt){if(!jetInCabin())return;const fw=((K.KeyW||K.ArrowUp)?1:0)-((K.KeyS||K.ArrowDown)?1:0)-(JV.y||0),st=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0)+(JV.x||0);
+ if(Math.abs(fw)+Math.abs(st)<.15)return;if(JW.seat){JW.seat=null;}const sp=2.2*dt,a=JW.a;JW.x+=(Math.sin(a)*fw-Math.cos(a)*st)*sp;JW.z+=(Math.cos(a)*fw+Math.sin(a)*st)*sp;
+ const r=.24;JW.z=clamp(JW.z,JETC.z0+.35,8.0);const hw=JW.z>7.05?.7:JETC.hw-.28;JW.x=clamp(JW.x,-hw,hw);
+ for(const b of JETC.rects){const cx=clamp(JW.x,b.x0,b.x1),cz=clamp(JW.z,b.z0,b.z1),dx=JW.x-cx,dz=JW.z-cz,d=Math.hypot(dx,dz);if(d<r){if(d>1e-4){JW.x=cx+dx/d*r;JW.z=cz+dz/d*r;}else{JW.x+=(JW.x<(b.x0+b.x1)/2?-1:1)*.05;}}}}
+function jetCabinE(p){if(!jetInCabin())return false;const A=p.jet.ap;
+ if(!JW.seat){let best=null,bd=1.1;for(const s of JETC.seats){const d=Math.hypot(s.x-JW.x,s.z-JW.z);if(d<bd){bd=d;best=s;}}
+  if(best&&!(JW.z>5.4&&JW.x>.25&&p.speed<1&&A&&(A.phase==='parked'||(A.phase==='wait'&&A.seated)))){JW.seat=best;JW.x=best.x;JW.z=best.z;JW.a=best.face>0?0:Math.PI;JW.pitch=-.05;
+   if(A&&A.phase==='wait'&&!A.seated){A.seated=true;toast('Pilot: seatbelt sign is on — here we go');}else toast('Seated');return true;}}
+ if(JW.z>5.3&&JW.x>.15&&p.speed<1&&(!A||A.phase==='parked'||A.phase==='wait')){return false;}// at the door: get off
+ if(!JW.seat)toast(p.speed>1?'Find a seat (E) — you can get off once we have landed':'Walk to a seat and press E to sit, or go to the door (E) to get off');else toast('Walk to the door to get off');return true;}
+{const _u=update;update=function(dt){jetWalk(dt);_u(dt);};}
 
 requestAnimationFrame(loop);
 </script>
