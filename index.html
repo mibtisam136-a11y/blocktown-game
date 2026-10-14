@@ -2523,7 +2523,7 @@ function openApp(id){sfx.click();$('psHome').hidden=true;document.querySelector(
  if(id==='settings'){const seg=(name,opts,cur)=>`<div class="seg" data-seg="${name}">${opts.map(([v,l])=>`<button data-v="${v}" class="${cur===v?'on':''}">${l}</button>`).join('')}</div>`;
   B_.innerHTML=`<div class="cap">Time of day · now ${fmtTOD()}</div><div class="list"><div class="li"><div class="tx">${seg('sky',[['auto','Live cycle'],['day','Day'],['sunset','Sunset'],['night','Night']],skyMode)}</div></div></div>
    <div class="cap">Weather</div><div class="list"><div class="li"><div class="tx">${seg('wx',[['auto','Changing'],['clear','Clear'],['rain','Rain']],wxMode)}</div></div></div>
-   <div class="cap">Graphics</div><div class="list"><div class="li"><div class="tx">${seg('q',[['low','Fast'],['med','Balanced'],['high','Best']],quality)}<p style="margin-top:6px">Use Fast if the game feels slow on your phone.</p></div></div></div>
+   <div class="cap">Graphics</div><div class="list"><div class="li"><div class="tx">${seg('q',[['low','Fast'],['med','Balanced'],['high','Best'],['ultra','Mac Ultra']],quality)}<p style="margin-top:6px">Use Fast if the game feels slow. Mac Ultra = sharpest shadows and longest view distance.</p></div></div></div>
    <div class="cap">Sound effects</div><div class="list"><div class="li"><div class="tx">${seg('snd',[['on','On'],['off','Off']],soundOn?'on':'off')}</div></div></div>`;
   B_.querySelectorAll('[data-seg]').forEach(s=>s.querySelectorAll('button').forEach(b=>b.onclick=()=>{const v=b.dataset.v,n=s.dataset.seg;
    if(n==='sky')setSkyMode(v);if(n==='wx'){wxMode=v;if(v!=='auto')rainTarget=v==='rain'?1:0;}if(n==='q'){quality=v;try{localStorage.setItem('btm_q',v);}catch(e){}applyQuality();}if(n==='snd'){soundOn=v==='on';if(sfxG)sfxG.gain.value=soundOn?1:0;}openApp('settings');}));}}
@@ -3455,7 +3455,7 @@ function v20Tick(dt){
 {const _u=update;update=function(dt){vehFire(dt);_u(dt);v20Tick(dt);};}
 
 // ---- graphics: longer draw distance on high quality ----
-{const _at=applyTOD;applyTOD=function(f){_at(f);if(quality==='high'){scene.fog.far*=1.35;scene.fog.near*=1.25;}};applyTOD(true);}
+{const _at=applyTOD;applyTOD=function(f){_at(f);if(quality==='high'){scene.fog.far*=1.35;scene.fog.near*=1.25;}else if(quality==='ultra'){scene.fog.far*=1.7;scene.fog.near*=1.5;}};applyTOD(true);}
 
 // ---- spawn everything ----
 // Fort Blockade apron: fighters face the runway, one F-16 is lined up ready to go
@@ -3779,6 +3779,14 @@ function jetCabinE(p){if(!jetInCabin())return false;const A=p.jet.ap;
  if(JW.z>5.3&&JW.x>.15&&p.speed<1&&(!A||A.phase==='parked'||A.phase==='wait')){return false;}// at the door: get off
  if(!JW.seat)toast(p.speed>1?'Find a seat (E) — you can get off once we have landed':'Walk to a seat and press E to sit, or go to the door (E) to get off');else toast('Walk to the door to get off');return true;}
 {const _u=update;update=function(dt){jetWalk(dt);_u(dt);};}
+
+/* ---- v24: Mac Ultra graphics + desktop app heartbeat ---- */
+{const _aq=applyQuality;applyQuality=function(){_aq();if(quality!=='ultra'){if(sc.right>140&&gameState==='play'){}return;}
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));if(sun.shadow.mapSize.x!==4096){sun.shadow.mapSize.set(4096,4096);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}}
+ sun.castShadow=true;grassMeshes.forEach(m=>m.visible=true);renderer.toneMappingExposure=1;camera.far=3400;camera.updateProjectionMatrix();applyTOD(true);resize();};}
+if(location.port==='47123'){try{if(!localStorage.getItem('btm_q_mac')){localStorage.setItem('btm_q_mac','1');quality='ultra';localStorage.setItem('btm_q','ultra');}}catch(e){}
+ setInterval(()=>{fetch('/__alive').catch(()=>{});},8000);}
+applyQuality();
 
 requestAnimationFrame(loop);
 </script>
