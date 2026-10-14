@@ -3652,6 +3652,116 @@ PLACES.push({name:'USS Blocktown carrier (board at Port Bay docks)',icon:'⚓',c
 
 {const _u=update;update=function(dt){_u(dt);houseGuards(dt);ferryTick(dt);if(money<999999999)money=999999999;};}
 
+/* =====================================================================
+   v23 — private jet: full cabin interior, airstairs, uniformed pilot,
+   "fly it yourself" or "pilot, fly me" (auto take-off, island tour, auto-landing)
+   ===================================================================== */
+PLANE_SPECS.bizjet.eye=[-.45,2.55,8.05];
+const JETC={floor:1.25,ceil:3.45,hw:1.12,z0:-6.2,z1:7.3,door:{x:1.2,z:6.3}};
+function buildJetInterior(){const IB=new Builder(),GLB=new Builder();const {floor:F,ceil:C,hw:W,z0,z1}=JETC;const zc=(z0+z1)/2,L=z1-z0;
+ const CREAM='#efe6d2',LEA='#e9dcc0',WAL='#5a3a22',GOLD='#c9a24a',DARK='#1d1f24',CARP='#3a3f4a';
+ IB.box(0,F-.06,zc+.9,W*2,.06,L+2,CARP);IB.box(0,C,zc+.9,W*2,.06,L+2,'#f4efe6');
+ for(let z=z0+.6;z<z1;z+=1.6)IB.box(0,C-.04,z,.8,.03,.14,'#fff7d6');
+ // side walls with real window openings
+ for(const s of[-1,1]){const x=s*W;IB.box(x,F,zc,.08,.8,L,CREAM);IB.box(x,F+1.38,zc,.08,C-F-1.38,L,CREAM);IB.box(x-s*.05,F+.78,zc,.08,.06,L,WAL);
+  for(let z=z0+.3;z<z1-.2;z+=1.25){IB.box(x,F+.8,z,.08,.58,.6,CREAM);GLB.box(x+s*.02,F+.8,z+.62,.03,.58,.62,'#bfe3ff');}}
+ IB.box(0,F,z0,W*2,C-F,.08,CREAM);IB.box(0,F,z0+.05,.8,2.0,.05,WAL);IB.box(.32,F+1,z0+.09,.05,.05,.03,GOLD);// rear bathroom door
+ // club seats facing each other + walnut tables
+ const seatAt=(x,z,face)=>{IB.box(x,F,z,.62,.45,.62,LEA);IB.box(x,F+.45,z-face*.27,.62,.72,.12,LEA);IB.box(x,F+1.12,z-face*.27,.4,.18,.12,LEA);for(const a of[-1,1])IB.box(x+a*.33,F+.45,z,.08,.22,.6,LEA);IB.box(x,F+.02,z,.5,.02,.5,GOLD);};
+ for(const s of[-1,1]){seatAt(s*.6,4.6,-1);seatAt(s*.6,2.9,1);IB.box(s*.6,F+.62,3.75,.55,.04,.75,WAL);IB.box(s*.6,F,3.75,.08,.62,.08,GOLD);}
+ seatAt(-.6,.9,-1);seatAt(-.6,-.8,1);IB.box(-.6,F+.62,.05,.55,.04,.75,WAL);
+ // divan sofa (right side) + side console
+ IB.box(.72,F,-.2,.6,.42,2.6,LEA);IB.box(.98,F+.42,-.2,.14,.55,2.6,LEA);for(let k=0;k<3;k++)IB.box(.92,F+.62,-1+k*.8,.12,.3,.5,'#d9c9a6');
+ IB.box(.75,F,-2.1,.5,.62,1,WAL);IB.box(.75,F+.62,-2.1,.52,.03,1.02,GOLD);
+ // aft lounge: two more seats
+ seatAt(-.6,-3.2,1);seatAt(.6,-3.2,1);IB.box(0,F,-4.4,1.6,.75,.5,WAL);IB.box(0,F+.75,-4.4,1.62,.04,.52,GOLD);
+ // galley / bar + TV bulkhead
+ IB.box(-.78,F,6.2,.5,.95,1.4,WAL);IB.box(-.78,F+.95,6.2,.52,.04,1.42,GOLD);IB.box(-.95,F+1.25,6.2,.12,.9,1.3,'#ece4d4');for(let k=0;k<4;k++)IB.box(-.85,F+1.02,5.7+k*.3,.06,.18,.06,'#7fd3e6');
+ IB.box(-.55,F,6.95,1.15,C-F,.08,CREAM);IB.box(-.55,F+1.25,6.9,.9,.5,.04,'#0a0c10');
+ // cockpit
+ IB.box(.62,F,7.6,.06,C-F-.4,.06,DARK);
+ for(const s of[-1,1]){const x=s*.45;IB.box(x,F,8.05,.5,.48,.55,'#2b2f36');IB.box(x,F+.48,7.82,.5,.75,.12,'#2b2f36');IB.box(x,F+.05,8.6,.08,.55,.08,DARK);IB.box(x,F+.6,8.6,.36,.05,.05,DARK);}
+ IB.box(0,F+.62,9.05,W*1.8,.5,.55,DARK);IB.box(0,F+.25,8.6,.25,.6,.6,DARK);IB.box(0,F,9,W*2,.62,.6,'#2b2f36');
+ for(const x of[-.75,-.28,.28,.75])IB.box(x,F+.9,8.83,.36,.26,.02,'#1e3a8a');
+ GLB.box(0,F+1.15,9.25,W*1.9,.7,.04,'#bfe3ff');
+ const g=new THREE.Group();const im=IB.mesh(new THREE.MeshBasicMaterial({vertexColors:true}));g.add(im);
+ const gm=GLB.mesh(new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:.22,metalness:.6,roughness:.05,depthWrite:false}));g.add(gm);
+ const lt=new THREE.PointLight('#fff1d6',0,9,2);lt.position.set(0,C-.3,2);g.add(lt);g.userData.light=lt;return g;}
+function buildStairs(){const g=new THREE.Group(),inner=new THREE.Group();g.add(inner);const n=5,h=JETC.floor/n;
+ const st=new THREE.MeshStandardMaterial({color:'#e5e7eb',metalness:.5,roughness:.35}),cp=new THREE.MeshLambertMaterial({color:'#7a1f2b'}),rl=new THREE.MeshStandardMaterial({color:'#c9a24a',metalness:.9,roughness:.25});
+ for(let i=0;i<n;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(.32,.05,.9),cp);s.position.set(.16+i*.3,-h*(i+1)+.03,0);inner.add(s);}
+ for(const z of[-.47,.47]){const r=new THREE.Mesh(new THREE.BoxGeometry(1.75,.05,.04),rl);r.position.set(.85,-.05,z);r.rotation.z=-Math.atan2(JETC.floor,1.5);inner.add(r);
+  const sd=new THREE.Mesh(new THREE.BoxGeometry(1.7,.12,.04),st);sd.position.set(.8,-.66,z);sd.rotation.z=-Math.atan2(JETC.floor,1.5);inner.add(sd);}
+ g.position.set(JETC.door.x,JETC.floor,JETC.door.z);return g;}
+function pilotNPC(){const m=makeHuman({shirt:'#f8fafc',pants:'#0f172a',cap:'#0f172a',shades:true});scene.add(m.root);return{m,x:0,z:0,y:0,h:0,spd:0};}
+const JET={};
+function jetDoorWorld(p,dx){const v=new THREE.Vector3(JETC.door.x+(dx||0),0,JETC.door.z);p.m.g.updateMatrixWorld(true);p.m.body.localToWorld(v);return v;}
+function jetSetup(p){if(p.jet)return;p.jet={interior:buildJetInterior(),stairs:buildStairs(),stairT:0,stairWant:0,pilot:pilotNPC(),pilotState:'wait',ap:null};
+ p.m.body.add(p.jet.interior);p.m.body.add(p.jet.stairs);jetPilotHome(p);}
+function jetPilotHome(p){const J=p.jet,v=jetDoorWorld(p,3.6);J.pilot.x=v.x;J.pilot.z=v.z;J.pilot.y=floorAt(v.x,v.z,(p.y||0)+1);J.pilot.h=Math.atan2(p.x-v.x,p.z-v.z);J.pilot.m.root.visible=true;J.pilotState='wait';}
+// ---- the choice when you walk up to the jet ----
+const JCH=document.createElement('div');JCH.id='jetChoice';JCH.hidden=true;JCH.innerHTML='<div class="jc-t">PRIVATE JET</div><button id="jcSelf"><b>Fly it myself</b><small>E</small></button><button id="jcPilot"><b>Pilot, fly me</b><small>T</small></button>';
+document.body.appendChild(JCH);
+{const st=document.createElement('style');st.textContent='#jetChoice{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);z-index:40;display:flex;gap:10px;align-items:center;background:rgba(12,20,38,.82);border:2px solid #c9a24a;border-radius:16px;padding:10px 12px;pointer-events:auto}#jetChoice[hidden]{display:none}#jetChoice .jc-t{font-family:var(--display);color:#c9a24a;font-size:14px;letter-spacing:1px;margin-right:4px}#jetChoice button{background:#1d2742;border:2px solid rgba(255,255,255,.7);border-radius:12px;padding:8px 14px;font-size:15px;text-align:center}#jetChoice button small{display:block;font-family:var(--body);font-size:10px;opacity:.75}#jetChoice #jcPilot{border-color:#c9a24a}';document.head.appendChild(st);}
+let jetAsk=null;
+function jetChoose(pilot){const p=jetAsk;JCH.hidden=true;jetAsk=null;if(!p||p.mode!=='parked')return;const J=p.jet;J.stairWant=1;
+ if(!pilot){J.boardT=.9;J.boardFn=()=>{p.__direct=true;enterPlane(p);p.__direct=false;};return;}
+ J.pilotState='board';J.boardT=1.6;J.boardFn=()=>{p.__direct=true;enterPlane(p);p.__direct=false;p.passenger=true;P.camMode=2;J.pilot.m.root.visible=false;J.ap={phase:'wait',t:1.2,wp:0};setModeUI();toast('Welcome aboard. Sit back — your pilot has it. L = land now · V = camera');};}
+$('jcSelf').addEventListener('click',e=>{e.stopPropagation();jetChoose(false);});$('jcPilot').addEventListener('click',e=>{e.stopPropagation();jetChoose(true);});
+{const _ep=enterPlane;enterPlane=function(p){if(p.kind==='bizjet'&&p.jet&&!p.__direct){if(jetAsk===p){jetChoose(false);return;}jetAsk=p;JCH.hidden=false;p.jet.stairWant=1;return;}_ep(p);if(p.kind==='bizjet'&&p.jet){p.jet.stairWant=0;p.jet.pilot.m.root.visible=false;}};}
+{const _ck=cockKind;cockKind=function(veh){if(veh.passenger)return null;return _ck(veh);};}
+{const _xp=exitPlane;exitPlane=function(f){const p=P.plane;if(p&&p.kind==='bizjet'&&p.jet&&!f&&p.speed>8){toast(p.passenger?'Wait until the pilot has stopped':'Slow down to get out');return;}
+ _xp(f);if(!p||p.kind!=='bizjet'||!p.jet||P.plane)return;const J=p.jet;J.stairWant=1;J.stairT=1;const v=jetDoorWorld(p,2.6);P.x=v.x;P.z=v.z;P.y=floorAt(v.x,v.z,(p.y||0)+.5)+.05;P.yaw=p.yaw-Math.PI/2;
+ const was=p.passenger;p.passenger=false;J.ap=null;jetPilotHome(p);if(was)toast('Thanks for flying Blocktown Private');P.camMode=0;};}
+// ---- autopilot ----
+const RUNWAYS=[{name:'Fort Blockade',t:{x:395,z:520},dir:{x:1,z:0},entry:{x:575,z:520}},{name:'Sky Harbour',t:{x:-372,z:-81},dir:{x:-1,z:0},entry:{x:-585,z:-81},to:{x:1,z:0}}];
+const TOUR=[[0,0],[0,400],[480,430],[760,0],[430,-120],[420,-280],[0,-520],[-480,40]];
+function nearestRunway(x,z){return RUNWAYS.reduce((b,r)=>Math.hypot(r.t.x-x,r.t.z-z)<Math.hypot(b.t.x-x,b.t.z-z)?r:b,RUNWAYS[0]);}
+function headTo(p,x,z){return Math.atan2(x-p.x,z-p.z);}
+function apFly(p,dt,tx,tz,alt,thr){const S=p.spec;const want=headTo(p,tx,tz);const err=angDiff(p.yaw,want);const g=Math.max(groundAt(p.x,p.z),0);
+ const pd=clamp((alt-p.y)*.012,-.18,.22);return{thr:clamp((thr-p.thr)*4,-1,1),turn:clamp(-err*2.2,-1,1),pitch:clamp((pd-p.pitch)*4,-1,1)};}
+function autopilot(p,dt){const A=p.jet.ap,S=p.spec;const onG=p.y<=Math.max(groundAt(p.x,p.z),-.6)+.3;
+ if(pressed.has('KeyL')||IN.land){if(A.phase==='tour'||A.phase==='climb'){A.phase='approach';A.rw=nearestRunway(p.x,p.z);toast('Pilot: heading in to land at '+A.rw.name);}}
+ switch(A.phase){
+ case 'wait':A.t-=dt;if(A.t<=0){A.rw0=nearestRunway(p.x,p.z);A.phase=onCarrier(p.x,p.z)?'roll':'taxi';}return{thr:0,turn:0,pitch:0};
+ case 'taxi':{const e=A.rw0.entry,d=Math.hypot(e.x-p.x,e.z-p.z);p.yaw+=angDiff(p.yaw,headTo(p,e.x,e.z))*Math.min(1,dt*1.6);p.speed=lerp(p.speed,Math.min(9,d*.8+2),dt*2);if(d<4){A.phase='lineup';}return{thr:0,turn:0,pitch:0};}
+ case 'lineup':{const td=A.rw0.to||{x:-A.rw0.dir.x,z:-A.rw0.dir.z};const w=Math.atan2(td.x,td.z);p.yaw+=angDiff(p.yaw,w)*Math.min(1,dt*2);p.speed=lerp(p.speed,3,dt*2);if(Math.abs(angDiff(p.yaw,w))<.03){p.yaw=w;A.phase='roll';toast('Pilot: cleared for take-off');}return{thr:0,turn:0,pitch:0};}
+ case 'roll':{p.thr=1;if(!onG&&p.y>Math.max(groundAt(p.x,p.z),0)+4){A.phase='climb';}if(p.speed>S.vr*1.08)return{thr:1,turn:0,pitch:p.pitch<.16?1:0};return{thr:1,turn:0,pitch:0};}
+ case 'climb':if(p.y>60){A.phase='tour';A.wp=0;}return apFly(p,dt,p.x+Math.sin(p.yaw)*400,p.z+Math.cos(p.yaw)*400,150,1);
+ case 'tour':{const w=TOUR[A.wp%TOUR.length];if(Math.hypot(w[0]-p.x,w[1]-p.z)<120){A.wp++;if(A.wp>=TOUR.length){A.phase='approach';A.rw=nearestRunway(p.x,p.z);toast('Pilot: tour complete, landing at '+A.rw.name);}}return apFly(p,dt,w[0],w[1],150,.75);}
+ case 'approach':{const R=A.rw,fx=R.dir.x,fz=R.dir.z,ax=R.t.x-fx*720,az=R.t.z-fz*720;if(Math.hypot(ax-p.x,az-p.z)<140){A.phase='final';}
+  if(p.speed>70)p.speed=Math.max(70,p.speed-14*dt);return apFly(p,dt,ax,az,48,clamp((65-p.speed)*.05+.4,0,1));}
+ case 'final':{const R=A.rw,fx=R.dir.x,fz=R.dir.z;const rx=p.x-R.t.x,rz=p.z-R.t.z;const along=rx*fx+rz*fz;const aim=along+170;
+  const tx=R.t.x+fx*aim,tz=R.t.z+fz*aim;const dist=Math.max(0,-along);const alt=dist*.075-1.5;
+  if(p.speed>50)p.speed=Math.max(50,p.speed-10*dt);const c=apFly(p,dt,tx,tz,alt,clamp((50-p.speed)*.06+.35,0,1));c.turn=clamp(c.turn,-(dist>220?.85:.45),dist>220?.85:.45);if(onG){A.phase='rollout';toast('Pilot: touchdown');}return c;}
+ case 'rollout':{const R=A.rw;p.yaw+=angDiff(p.yaw,Math.atan2(R.dir.x,R.dir.z))*Math.min(1,dt*1.5);p.thr=0;p.speed=Math.max(0,p.speed*Math.exp(-.9*dt)-5*dt);p.pitch=0;if(p.speed<2.5){p.speed=0;A.phase='parked';p.jet.stairWant=1;toast('Pilot: we have arrived. Press E to get off');}return{thr:-1,turn:0,pitch:0};}
+ default:p.speed=0;return{thr:-1,turn:0,pitch:0};}}
+{const _up=updPlane;updPlane=function(p,dt,c){if(p.passenger&&p.jet&&p.jet.ap&&p.mode==='player'){c=autopilot(p,dt);CK.t=c.turn;CK.p=c.pitch;}_up(p,dt,c);};}
+// ---- per-frame: stairs, pilot walking, cabin camera ----
+function jetTick(dt){for(const p of planes){if(p.kind!=='bizjet'||!p.m.real)continue;jetSetup(p);const J=p.jet;
+  if(J.boardT>0){J.boardT-=dt;if(J.boardT<=0&&J.boardFn){const f=J.boardFn;J.boardFn=null;f();}}
+  const want=(p.mode==='parked'||J.boardT>0||(J.ap&&J.ap.phase==='parked'))?J.stairWant:0;J.stairT=clamp(J.stairT+(want?1:-1)*dt*1.4,0,1);
+  J.stairs.rotation.z=(1-J.stairT)*1.55;J.stairs.visible=J.stairT>.02||p.mode==='parked';
+  const pl=J.pilot,d=Math.hypot(pl.x-camera.position.x,pl.z-camera.position.z);
+  if(J.pilotState==='board'){const v=jetDoorWorld(p,0);const dx=v.x-pl.x,dz=v.z-pl.z,dd=Math.hypot(dx,dz);if(dd>.3){pl.x+=dx/dd*Math.min(dd,2.4*dt);pl.z+=dz/dd*Math.min(dd,2.4*dt);pl.h=Math.atan2(dx,dz);pl.spd=2.4;pl.y=lerp(pl.y,(p.y||0)+JETC.floor*(1-Math.min(1,dd/3)),.2);}else{pl.m.root.visible=false;J.pilotState='aboard';}}
+  else pl.spd=0;
+  if(p.mode==='parked'&&J.pilotState!=='board'&&!pl.m.root.visible)jetPilotHome(p);
+  if(pl.m.root.visible){if(MODELS.ready&&!pl.m.real){humanize(pl.m,0,{shirt:'#f8fafc',pants:'#0f172a',cap:'#0f172a'});}const m=pl.m;m.root.position.set(pl.x,pl.y,pl.z);m.root.rotation.y=pl.h;if(m.mixer&&d<90){setAct(m,pl.spd>.2?'walk':'idle',.2);m.mixer.update(dt);}}
+  J.interior.visible=Math.hypot(p.x-camera.position.x,p.z-camera.position.z)<60;J.interior.userData.light.intensity=(P.plane===p&&p.passenger)?.9:0;
+  if(jetAsk===p&&Math.hypot(P.x-p.x,P.z-p.z)>16){JCH.hidden=true;jetAsk=null;J.stairWant=0;}}}
+{const _uc=updateCamera;updateCamera=function(dt){_uc(dt);const p=P.plane;if(!p||!p.passenger||!p.jet)return;
+ if(P.camMode===2){const m=p.m;if(m.real)m.real.visible=false;m.pilot.root.visible=true;const v=new THREE.Vector3(-.6,JETC.floor+1.12,2.98);m.g.updateMatrixWorld(true);m.body.localToWorld(v);
+  const q=new THREE.Quaternion();m.body.getWorldQuaternion(q);camera.position.copy(v);camera.quaternion.copy(q);camera.rotateY(Math.PI+camOrbit);camera.rotateX(-.05+camPitchI);
+  if(Math.abs(camera.fov-75)>.1){camera.fov=lerp(camera.fov,75,.2);camera.updateProjectionMatrix();}}
+ else if(p.m.real)p.m.real.visible=true;};}
+{const _u=update;update=function(dt){_u(dt);jetTick(dt);if(jetAsk&&!P.car&&!P.plane&&!P.heli&&gameState==='play'){if(pressed.has('KeyT'))jetChoose(true);}};}
+// pressed is cleared at the end of update, so catch T before it
+{const _up2=updatePlayer;updatePlayer=function(dt){if(jetAsk&&pressed.has('KeyT')){jetChoose(true);pressed.delete('KeyT');}if(P.plane&&P.plane.passenger&&pressed.has('KeyL')){IN.land=true;}_up2(dt);IN.land=false;};}
+// touch: LAND button in the plane pad
+{const b=document.createElement('button');b.className='outl sm';b.dataset.k='land';b.textContent='LAND';b.id='bLand';b.hidden=true;const pad=$('planeR');if(pad)pad.prepend(b);
+ b.addEventListener('pointerdown',e=>{e.preventDefault();IN.land=true;setTimeout(()=>IN.land=false,300);});}
+{const _sm=setModeUI;setModeUI=function(){_sm();const b=$('bLand');if(b)b.hidden=!(P.plane&&P.plane.passenger);};}
+
 requestAnimationFrame(loop);
 </script>
 
