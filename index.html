@@ -336,9 +336,10 @@ const ISLANDS=[
  {name:'Palm Key',cx:0,cz:400,h:110,rx:[-55,0,55],rz:[360,440],tex:1024,sandIn:16,npc:isTouch?5:8,traffic:isTouch?2:3},
  {name:'Sky Harbour',cx:-480,cz:40,h:150,rx:[-460,-400],rz:[80,140],tex:1024,sandIn:8,npc:isTouch?4:6,traffic:2},
  {name:'Fort Blockade',cx:480,cz:430,h:150,rx:[380,480,580],rz:[360,440],tex:1024,sandIn:8,npc:isTouch?4:6,traffic:2},
- {name:'Neon Heights',cx:760,cz:0,h:120,rx:[700,760,820],rz:[-60,0,60],tex:1024,sandIn:8,npc:isTouch?6:10,traffic:2}];
+ {name:'Neon Heights',cx:760,cz:0,h:120,rx:[700,760,820],rz:[-60,0,60],tex:1024,sandIn:8,npc:isTouch?6:10,traffic:2},
+ {name:'Vinewood Downtown',cx:800,cz:430,h:150,rx:[710,800,890],rz:[340,440,530],tex:2048,sandIn:8,npc:isTouch?6:12,traffic:isTouch?3:5}];
 ISLANDS.forEach(i=>{i.sx=i.rx.flatMap(r=>[r-7,r+7]).sort((a,b)=>a-b);i.sz=i.rz.flatMap(r=>[r-7,r+7]).sort((a,b)=>a-b);});
-const [MAIN,PORT,PALM,AIR,FORT,NEON]=ISLANDS;
+const [MAIN,PORT,PALM,AIR,FORT,NEON,DT]=ISLANDS;
 const DECKS=[{x0:205,x1:315,z0:-7,z1:7,kind:'x'},{x0:-7,x1:7,z0:205,z1:290,kind:'z'},{x0:-330,x1:-205,z0:73,z1:87,kind:'x'},{x0:36,x1:44,z0:507,z1:552,kind:'pier'}];
 const MTN={cx:0,cz:-525,h:175};MTN.x0=MTN.cx-MTN.h;MTN.x1=MTN.cx+MTN.h;MTN.z0=MTN.cz-MTN.h;MTN.z1=MTN.cz+MTN.h;
 const MPEAKS=[[40,-575,78,62],[-75,-480,48,52],[95,-445,32,42],[-40,-620,40,48],[110,-610,36,40],[-120,-560,26,38]];
@@ -583,8 +584,8 @@ function mansion(){const WH='#f6f4ef',ST='#d6c6a8',WD='#8a5a36',WD2='#5e3a22',DK
  const ceilM=new THREE.MeshBasicMaterial({color:'#e9e2d4'}),woodC=new THREE.MeshBasicMaterial({color:'#b88b5e'}),dlM=new THREE.MeshBasicMaterial({color:'#fff7d6'});
  const ceil=(x0,x1,z0,z1,y,mat=ceilM)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0).rotateX(Math.PI/2),mat);m.position.set((x0+x1)/2,y,(z0+z1)/2);scene.add(m);
   for(let x=x0+2;x<x1-1;x+=3.5)for(let z=z0+1.6;z<z1-.8;z+=3.2){const d=new THREE.Mesh(new THREE.CircleGeometry(.2,10).rotateX(Math.PI/2),dlM);d.position.set(x,y-.01,z);scene.add(d);}};
- ceil(34.15,77.85,464.8,476.85,4.38);ceil(34.15,50,462.15,464.8,4.38);ceil(60,77.85,462.15,464.8,4.38);ceil(34,78,477,481,4.38,woodC);
- ceil(34.15,77.85,462.15,477.85,8.73);ceil(33.6,78.4,478,481.6,8.73,woodC);ceil(59.8,68.2,457.2,461.8,4.38,woodC);
+ //ceil(34.15,77.85,464.8,476.85,4.38);ceil(34.15,50,462.15,464.8,4.38);ceil(60,77.85,462.15,464.8,4.38);ceil(34,78,477,481,4.38,woodC);
+ //ceil(34.15,77.85,462.15,477.85,8.73);ceil(33.6,78.4,478,481.6,8.73,woodC);ceil(59.8,68.2,457.2,461.8,4.38,woodC);
  const railM=new THREE.MeshLambertMaterial({color:'#bfe6ff',transparent:true,opacity:.22,depthWrite:false,side:THREE.DoubleSide});
  const railG=new THREE.BoxGeometry(1,1,1);const rail=(cx,y,cz,w,h,d)=>{const m=new THREE.Mesh(railG,railM);m.scale.set(w,h,d);m.position.set(cx,y+h/2,cz);scene.add(m);};
  // ---------- ground paint ----------
@@ -603,67 +604,6 @@ function mansion(){const WH='#f6f4ef',ST='#d6c6a8',WD='#8a5a36',WD2='#5e3a22',DK
  for(const x of[50.6,61.4]){B.box(x,0,449,1.4,3.2,1.4,ST);B.box(x,3.2,449,1.6,.25,1.6,WH);B.box(x,3.45,449,.5,.5,.5,GD);lampPos.push(x,3.7,449);sol(x-.7,x+.7,448.3,449.7,3.4);}
  B.box(56,4.0,449,12.4,.35,.4,DK);signBoard('VIP ESTATE',56,4.95,448.6,Math.PI,8,1.5,'#111214','#d4af37','#d4af37');
  // ---------- forecourt: fountain + parking ----------
- // ---------- MANSION: ground floor (x 34..78, z 462..477) ----------
- B.box(56,0,469.5,44.6,.14,15.6,'#f1ebdf');for(let x=35;x<78;x+=3)B.box(x,.141,469.5,.04,.005,15,'#dcd3c2');
- win(34,462,46,462,0,ST);win(46,462,62,462,0,ST);wl(66,462,78,462,0,WH);
- B.box(64,0,462,4,.2,.4,DK);B.box(64,4,462,4.4,.4,.5,DK);addDoor(62,462,66,462,0,4,'wood');
- for(const [a,b] of[[34,44],[50,62],[68,78]])wl(a,477,b,477,0,GL,true);
- wl(34,462,34,477,0,WH);win(78,462,78,477,0,WD);
- wl(46,462,46,470,0,WH);wl(46,473,46,477,0,WH);addDoor(46,470,46,473,0,3,'wood');wl(67,462,67,465,0,WH);wl(67,474,67,477,0,WH);
- B.box(64,4.4,459.5,9,.3,5,WH);for(const x of[60.2,67.8]){B.add(G.cyl,x,0,457.6,.22,4.4,.22,GD);sol(x-.3,x+.3,457.3,457.9,4.4);}lampPos.push(64,4.2,460);
- // stairs (floating oak treads) x 60 -> 50, up to L1
- for(let i=0;i<16;i++){const x=60-(i+.5)*10/16,h=(i+1)*L1/16;B.box(x,h-.12,463.55,.66,.12,2.4,'#b98a5a');}
- B.box(55,0,464.9,10,.12,.1,DK);for(let i=0;i<=5;i++){const x=60-i*2,h=(i*2)*L1/10;B.box(x,h,464.9,.06,1,.06,DK);}
- sol(50,57.5,462.3,464.8,.6);FLOORS.push({x0:50,x1:60,z0:462.3,z1:464.8,h:L1,ax:'x',flip:true});
- // cinema (x 34..46)
- B.box(34.4,.9,469.5,.15,2.7,8,'#e8edf3');B.box(34.3,.7,469.5,.2,3.1,8.4,DK);B.box(40,0,469.5,11.4,.04,14.6,'#3a1418');
- for(const [x,h] of[[39.5,0],[43,.3]]){B.box(x,0,469.5,1.6,h+.01,9,DK);for(let z=466.3;z<473.5;z+=2.1){B.box(x,h,z,1.2,.55,1.6,'#9f1d2c');B.box(x+.55,h+.55,z,.25,.75,1.6,'#9f1d2c');}sol(x-.8,x+.8,465.5,473.5,.9+h);}
- B.box(45,0,476,.9,1.6,.7,'#c1121f');B.box(45,1.6,476,.95,.5,.75,'#fff6d0');
- // living (x 46..67)
- B.box(53,.14,472,8,.03,6,'#c9b48f');B.box(53.5,0,474.6,7,.75,1.2,CR);B.box(53.5,.75,475.2,7,.65,.35,CR);B.box(49.7,0,472.6,1.2,.75,4,CR);sol(49.1,57,471.8,475.4,.9);
- B.box(53.5,0,472,2.6,.42,1.3,MB2);B.box(53.5,.42,472,2.7,.05,1.4,GD);sol(52.2,54.8,471.3,472.7,.5);
- B.box(46.25,0,466,.4,4.4,7.8,'#3a3b40');B.box(46.5,.5,466,.2,1,2.6,'#ff8a2a');B.box(46.45,1.9,466,.1,1.4,2.6,'#0b0c10');
- // dining
- B.box(62,0,470.5,1.6,.75,4.2,WD2);for(const z of[469,470.5,472])for(const s of[-1,1]){B.box(62+s*1.25,0,z,.55,.5,.55,CR);B.box(62+s*1.5,.5,z,.1,.6,.55,CR);}sol(60.6,63.4,468.3,472.7,.8);
- B.box(62,3.9,470.5,.05,.5,.05,GD);B.box(62,3.2,470.5,1.2,.25,1.2,GD);B.box(62,3.05,470.5,.9,.15,.9,'#fff6d0');lampPos.push(62,3.1,470.5);
- // kitchen (x 67..78)
- B.box(77.3,0,469.5,1.1,.95,13,MB2);B.box(77.3,.95,469.5,1.2,.06,13,'#111214');B.box(77.6,1.5,469.5,.6,1.6,10,'#ffffff');sol(76.7,78,463,476,1);
- B.box(72.5,0,469.5,1.8,.95,5,'#f7f7f5');B.box(72.5,.95,469.5,2.1,.07,5.4,'#e9e2d0');for(const z of[467.8,469.5,471.2]){B.box(70.7,0,z,.45,.75,.45,GD);}sol(71.5,73.5,466.9,472.1,1);
- B.box(68.2,0,476.2,1.2,2.3,1,'#c0c6cf');sol(67.6,68.8,475.7,476.7,2.3);
- for(const [x,z] of[[47.4,476],[66.2,463.2],[35,463.2]]){B.add(G.cyl,x,0,z,.35,.6,.35,'#e8e2d5');B.add(G.ico,x,1,z,.65,.75,.65,'#2f7a32');}
- // ---------- upper floor (x 34..78, z 462..481) ----------
- fl(34,78,464.8,481);fl(34,50,462,464.8);fl(60,78,462,464.8);
- win(34,462,56,462,1,WH);win(56,462,78,462,1,WD);wl(34,462,34,478,1,WH);wl(78,462,78,478,1,WD);
- sol(50,60,464.7,464.9,1.1,L1);sol(59.9,60.1,462,464.8,1.1,L1);rail(55,L1,464.8,10,1,.08);B.box(55,L1+1,464.8,10,.06,.1,GD);
- wl(34,467,43,467,1,WH);wl(45.5,467,52,467,1,WH);wl(64,467,70,467,1,WH);wl(72.5,467,78,467,1,WH);addDoor(43,467,45.5,467,L1,3,'wood');addDoor(70,467,72.5,467,L1,3,'wood');
- wl(52,467,52,478,1,WH);wl(64,467,64,478,1,WH);
- for(const [a,b] of[[34,40],[44,52],[52,55],[61,64],[64,68],[72,78]])wl(a,478,b,478,1,GL,true);
- rail(56,L1,481,44,1.05,.1);B.box(56,L1+1.05,481,44.2,.07,.14,GD);sol(34,78,480.85,481.15,1.2,L1);for(const x of[34,78]){rail(x,L1,479.5,.1,1.05,3);sol(x-.15,x+.15,478,481,1.2,L1);}
- for(const x of[34.3,77.7])B.box(x,0,480.7,.35,4.4,.35,DK);
- // roofs: main roof with wood soffit, rooftop deck rim
- B.box(56,TOP,471.5,45.6,.45,20.6,WH);B.box(56,TOP+.45,471.5,44,.25,19,'#dcd7cc');
- B.box(43,TOP+.7,470,8,.9,6,'#8a5a36');B.box(65,TOP+.7,474,10,.12,6,'#b98a5a');
- // wood cladding accents on facade
- B.box(70,L1,461.8,8,TOP-L1,.15,WD);B.box(34,0,469.5,.2,4.4,15,WH);
- // master bedroom (x 34..52)
- B.box(43,L1+.02,473,9,.03,8,'#d8cbb0');B.box(36.6,L1,472,3.4,.6,4,'#f5f2ea');B.box(36.6,L1+.6,472.6,3.3,.12,2.8,'#d4af37');B.box(34.5,L1,472,.4,1.9,4.6,'#5b3a24');B.box(35.2,L1+.72,470.6,.7,.2,1,'#ffffff');B.box(35.2,L1+.72,473.4,.7,.2,1,'#ffffff');
- for(const z of[469.2,474.8]){B.box(35,L1,z,.8,.6,.8,WD2);B.box(35,L1+.6,z,.3,.5,.3,'#fff6d0');}sol(34,39,469.8,474.4,.8,L1);
- B.box(49.5,L1,467.5,4.2,2.6,.7,WD2);B.box(49.5,L1+.2,467.88,4,.2,.05,GD);sol(47.4,51.6,467,467.9,2.7,L1);
- B.box(45,L1,476.5,2.6,.6,1.1,'#ffffff');B.box(45,L1+.3,476.5,2.2,.3,.8,'#7cc7ee');sol(43.7,46.3,475.9,477.1,.7,L1);
- // lounge + bar (x 52..64)
- B.box(58,L1,471.5,3.8,.8,2,WD2);B.box(58,L1+.8,471.5,3.6,.06,1.8,'#1e7a3c');sol(56.1,59.9,470.5,472.5,.9,L1);
- B.box(53,L1,472,1,1.1,6,'#2a2c31');B.box(53,L1+1.1,472,1.2,.07,6.2,GD);B.box(52.3,L1+1.4,472,.15,1.6,5.4,'#3a2a1c');for(const z of[470,472,474])B.box(54.1,L1,z,.45,.8,.45,GD);sol(52.4,53.6,469,475,1.2,L1);
- B.box(58,L1,476.6,5,.7,1.2,CR);B.box(58,L1+.7,477.1,5,.6,.3,CR);sol(55.5,60.5,476,477.3,.8,L1);
- // bedroom 2 (x 64..78)
- B.box(75.6,L1,472.5,3,.55,3.6,'#f5f2ea');B.box(75.6,L1+.55,472.5,2.9,.1,3.4,'#8fb3cf');B.box(77.6,L1,472.5,.3,1.6,4,'#c9b48f');sol(74,78,470.6,474.4,.8,L1);
- B.box(66,L1,469,.9,.78,2.2,WD);B.box(66.1,L1+.78,469,.1,.55,.9,'#111111');sol(65.5,66.5,467.9,470.1,.9,L1);
- // balcony loungers
- for(const x of[38,48,70]){B.box(x,L1,479.6,1.8,.4,.8,'#ffffff');B.box(x-.8,L1+.4,479.6,.3,.5,.8,'#ffffff');}
- // ---------- terrace, pool, jacuzzi ----------
- B.box(56,0,479.5,46,.1,5,'#e3ddcf');B.box(55,0,486,36,.12,11,'#efeae0');
- B.box(55,.02,485.5,30,.14,7,'#27b0e8');B.box(55,.03,485.5,29.6,.14,6.6,'#3cc4f2');B.box(68.2,.04,483.4,3.2,.15,2.8,'#8fe0ff');B.box(68.2,0,483.4,3.8,.35,3.4,ST);B.box(68.2,.04,483.4,3.1,.33,2.7,'#8fe0ff');
- for(let i=0;i<6;i++){const x=42+i*4.4;B.box(x,0,490.3,.8,.32,2,'#ffffff');B.box(x,.32,489.6,.82,.5,.4,'#ffffff');B.box(x,.32,490.6,.7,.08,1.2,GD);}
- for(const x of[44,57,66])B.add(G.cyl,x+2.2,0,490.4,.08,2.6,.08,'#cfcfcf'),B.add(G.cone,x+2.2,2.3,490.4,1.6,.6,1.6,'#f4efe2');
  // cabanas (curved wood shells like the reference)
  const shellGeo=(()=>{const sh=new THREE.Shape();sh.absarc(0,.15,2.5,Math.PI*1.06,Math.PI*.2,true);sh.absarc(0,.15,2.32,Math.PI*.2,Math.PI*1.06,false);
   const g=new THREE.ExtrudeGeometry(sh,{depth:3.2,bevelEnabled:false,curveSegments:24});g.rotateY(Math.PI/2);g.translate(-1.6,0,0);g.computeVertexNormals();return g;})();
@@ -1184,6 +1124,23 @@ for(const r of NEON.rx)for(let t=-40;t<=40;t+=40)lamp(r+7.4,t+20,0);
 for(const r of NEON.rz)for(let t=710;t<=810;t+=50)lamp(t,r-7.4,Math.PI/2);
 islandMeshes.push({isl:NEON,b:B,pt:PT});
 
+/* ---- Vinewood Downtown: skyscraper island east of Fort Blockade (v29) ---- */
+B=new Builder();PT=makePainter(DT);DT.pt=PT;
+paintBase(PT,DT,'#5aa840');
+paintRoads(PT,DT);roadDetail(PT,DT);streetFurniture(DT,true);
+// bridge from Fort Blockade (its z=440 road) across the channel
+connector(FORT.pt,587,433,632,447);connector(PT,646,433,703,447);DECKS.push({x0:630,x1:650,z0:433,z1:447,kind:'x'});
+// plazas under the big towers
+for(const [x0,z0,x1,z1,c] of[[717,347,793,433,'#cfcac0'],[807,347,883,433,'#bdb8ad'],[717,447,793,523,'#cfcac0'],[807,447,883,523,'#c7c2b6'],[717,287,793,333,'#bdb8ad']])lotPaint(PT,x0,z0,x1,z1,c);
+// park with lake in the east block
+PT.rect(897,447,944,523,'#4fa53a');PT.circ(920,485,13,'#2f8fd0');PT.ring(920,485,13,.6,'#e5dcc4');for(let k=0;k<26;k++){const a=rnd(899,942),b=rnd(449,521);if(Math.hypot(a-920,b-485)<16)continue;tree(a,b);}
+// mid-rise ring (procedural) so the skyline has depth
+for(const [x,z,w,d,h,c] of[[668,300,22,22,46,'#c9d3dc'],[668,385,20,26,58,'#9fb4c8'],[668,485,22,24,40,'#dcd6cc'],[668,555,20,18,34,'#b8c4d0'],
+ [755,560,24,18,52,'#cfd6dd'],[845,560,26,18,44,'#a7b8c7'],[920,560,20,18,38,'#e2c9b0'],[920,385,22,26,72,'#8fa6bd'],[920,300,22,22,54,'#cdd5de'],[845,300,28,24,66,'#b4c3d2']])tower(x,z,w,d,h,c);
+for(const r of DT.rx)for(let t=300;t<=560;t+=65)lamp(r+7.4,t,0);
+for(const r of DT.rz)for(let t=670;t<=930;t+=65)lamp(t,r-7.4,Math.PI/2);
+signBoard('VINEWOOD DOWNTOWN',655,6,452,-Math.PI/2,14,2.2,'#0f172a','#ffffff','#d4af37');
+islandMeshes.push({isl:DT,b:B,pt:PT});
 /* ---- Redwood Peaks: mountain island ---- */
 {const N=180,S=MTN.h*2;const geo=new THREE.PlaneGeometry(S,S,N,N).rotateX(-Math.PI/2);const pos=geo.attributes.position,cols=new Float32Array(pos.count*3);const c=new THREE.Color();
  for(let i=0;i<pos.count;i++){const x=pos.getX(i)+MTN.cx,z=pos.getZ(i)+MTN.cz;let y=mtnH(x,z);if(y<-5)y=-3;pos.setY(i,y);
@@ -1633,7 +1590,10 @@ const OUTFITS=[
  {name:'Midnight Hoodie',desc:'All black everything, matching cap.',price:120,look:{shirt:'#18181b',pants:'#27272a',cap:'#18181b',shades:true}},
  {name:'Street Camo',desc:'Olive top, charcoal cargos, sand cap.',price:180,look:{shirt:'#5b6b3a',pants:'#3d3d3d',cap:'#c2a14a',shades:false}},
  {name:'Sunset Drop',desc:'Orange heavyweight tee, white trousers.',price:220,look:{shirt:'#f97316',pants:'#f1f1f1',cap:'#111111',shades:true}},
- {name:'Royal Tracksuit',desc:'Deep blue tracksuit, gold cap.',price:260,look:{shirt:'#1e3a8a',pants:'#1e3a8a',cap:'#eab308',shades:true}}];
+ {name:'Royal Tracksuit',desc:'Deep blue tracksuit, gold cap.',price:260,look:{shirt:'#1e3a8a',pants:'#1e3a8a',cap:'#eab308',shades:true}},
+ {name:'Black Hoodie & Joggers',desc:'Heavyweight black hoodie, joggers, red kicks.',price:0,hum:'hoodie',look:{shirt:'#111111',pants:'#111111',cap:null,shades:false}},
+ {name:'VIP Suit',desc:'Tailored black suit, white shirt, shades.',price:0,hum:'suit',look:{shirt:'#0b0b0d',pants:'#0b0b0d',cap:null,shades:true}}];
+if(!SAVE.v25fit){SAVE.v25fit=1;SAVE.outfits=SAVE.outfits||[0];for(const i of[6,7])if(!SAVE.outfits.includes(i))SAVE.outfits.push(i);SAVE.outfit=6;}
 Object.assign(ME_LOOK,OUTFITS[SAVE.outfit||0].look);
 let stars=0,lastCrime=-99,crimeCount=0,clock=0,gameState='menu';
 
@@ -3224,6 +3184,14 @@ function retarget(srcRoot,srcT,clips,tgtRoot,tgtT){const SB=bonesByKey(srcRoot),
   out.push(new THREE.AnimationClip(clip.name,clip.duration,order.map(o=>new THREE.QuaternionKeyframeTrack(o.name+'.quaternion',times,vals[o.uuid]))));}
  return out;}
 let SOL_SRC=null;
+const HUM2=['hoodie','guard','suit','coat'];
+function humIdx(k){const i=3+HUM2.indexOf(k);return MODELS.hum[i]?i:0;}
+function meHum(){const o=OUTFITS[SAVE.outfit||0];return o&&o.hum?humIdx(o.hum):0;}
+function npcHumIdx(){const r=Math.random();return r<.3?0:r<.6?1:r<.75?humIdx('hoodie'):r<.9?humIdx('coat'):humIdx('suit');}
+function prepHuman2(g,kind){const s=g.scene;s.traverse(o=>{if(o.isBone)o.name=o.name.replace(/_\d+$/,'');if(o.isMesh)o.frustumCulled=false;});s.updateMatrixWorld(true);
+ const pr=prepHuman(g,SOL_SRC.clips,kind);s.updateMatrixWorld(true);const B=bonesByKey(s),w=k=>B[k]?B[k].getWorldPosition(new THREE.Vector3()).y:null;
+ const top=w('HeadTop_End')??(w('Head')!=null?w('Head')+.2*(w('Head')-w('Hips')):1.8),toe=Math.min(...['LeftToe_End','LeftToeBase','LeftFoot','RightToe_End','RightToeBase','RightFoot'].map(w).filter(v=>v!=null));
+ const h=Math.max(.01,top-toe+.03);pr.scale=1.8/h;pr.yoff=-(toe-.03)*pr.scale;return pr;}
 function prepHuman(g,clips,kind){const s=g.scene;s.updateMatrixWorld(true);let top=null;
  s.traverse(o=>{if(o.isBone&&/HeadTop_End$/.test(o.name))top=o;if(o.isMesh){o.castShadow=true;const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if(m.isMeshStandardMaterial){m.envMap=envTex;m.envMapIntensity=.6;m.roughness=Math.max(m.roughness,.55);m.metalness=Math.min(m.metalness,.2);}});}});
  const v=new THREE.Vector3();if(top)top.getWorldPosition(v);const sc=v.y>0?1.78/v.y:1;
@@ -3232,8 +3200,8 @@ function prepHuman(g,clips,kind){const s=g.scene;s.updateMatrixWorld(true);let t
  else cs=retarget(SOL_SRC.scene,fc(SOL_SRC.clips,'tpose'),src,s,fc(g.animations||[],'tpose'));
  s.updateMatrixWorld(true);return{scene:s,scale:sc,kind,yaw:-faceYaw(s),clips:{idle:fc(cs,'idle'),walk:fc(cs,'walk'),run:fc(cs,'run')}};}
 const SKIN_T=['#ffffff','#f1d3bd','#c99a78','#8f6145','#6b4630'];
-function humanize(m,vi,look){if(!MODELS.ready||!MODELS.hum.length||m.real)return;const pr=MODELS.hum[vi%MODELS.hum.length];if(!pr.clips.walk)return;
- const inst=THREE.SkeletonUtils.clone(pr.scene);inst.scale.setScalar(pr.scale);inst.rotation.y=pr.yaw||0;
+function humanize(m,vi,look){if(!MODELS.ready||!MODELS.hum.length||m.real)return;const pr=MODELS.hum[vi%MODELS.hum.length]||MODELS.hum[0];if(!pr.clips.walk)return;
+ const inst=THREE.SkeletonUtils.clone(pr.scene);inst.scale.setScalar(pr.scale);inst.rotation.y=pr.yaw||0;inst.position.y=pr.yoff||0;m.humKind=pr.kind;
  for(const c of m.body.children)c.visible=false;m.body.add(inst);m.real=inst;const ud=m.root.userData.npc;if(ud)inst.traverse(o=>o.userData.npc=ud);
  if(pr.kind==='rpm'){const top=look&&look.shirt?look.shirt:pick(SHIRT),bot=look&&look.pants?look.pants:pick(PANTS),sk=look?'#f1d3bd':pick(SKIN_T);
   inst.traverse(o=>{if(!o.isMesh)return;const n=o.material.name||'';
@@ -3252,8 +3220,8 @@ function poseSeated(inst,bike){inst.updateMatrixWorld(true);const B=bonesByKey(i
   const cur=c.getWorldPosition(new THREE.Vector3()).sub(o.getWorldPosition(new THREE.Vector3())).normalize(),want=new THREE.Vector3(...D[k]).normalize();
   const dq=new THREE.Quaternion().setFromUnitVectors(cur,want),W=o.getWorldQuaternion(new THREE.Quaternion()),PW=o.parent.getWorldQuaternion(new THREE.Quaternion());o.quaternion.copy(PW.invert().multiply(dq.multiply(W)));}
  inst.updateMatrixWorld(true);}
-function humanizeSeated(h,look,bike){if(!MODELS.ready||!MODELS.hum.length||!h||h.real)return;const pr=MODELS.hum[0];const inst=THREE.SkeletonUtils.clone(pr.scene);inst.scale.setScalar(pr.scale);inst.rotation.y=pr.yaw||0;
- const wrap=new THREE.Group();wrap.add(inst);poseSeated(wrap,bike);inst.position.y=bike?-.05:-.12;
+function humanizeSeated(h,look,bike){if(!MODELS.ready||!MODELS.hum.length||!h||h.real)return;const pr=MODELS.hum[look===ME_LOOK?meHum():(look&&look.hum!=null&&MODELS.hum[look.hum]?look.hum:0)]||MODELS.hum[0];const inst=THREE.SkeletonUtils.clone(pr.scene);inst.scale.setScalar(pr.scale);inst.rotation.y=pr.yaw||0;
+ const wrap=new THREE.Group();wrap.add(inst);poseSeated(wrap,bike);inst.position.y=(bike?-.05:-.12)+(pr.yoff||0);
  inst.traverse(o=>{if(!o.isMesh)return;const n=o.material.name||'';if(/Outfit_Top/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set(look.shirt||'#14b8a6');}else if(/Headwear/.test(n))o.visible=!!look.cap;else if(/Beard/.test(n))o.visible=false;o.frustumCulled=false;});
  h.pivot.rotation.x=0;for(const c of h.body.children)c.visible=false;h.body.add(wrap);h.real=wrap;}
 function setAct(m,name,fade=.25){if(!m.act||!m.act[name])name='walk';if(m.cur===name)return;const a=m.act[name];a.reset().setEffectiveWeight(1).play();if(fade)a.fadeIn(fade);if(m.cur&&m.act[m.cur]){if(fade)m.act[m.cur].fadeOut(fade);else m.act[m.cur].stop();}m.cur=name;}
@@ -3318,12 +3286,13 @@ const _wq=new THREE.Quaternion();
 (async()=>{try{if(!THREE.GLTFLoader||!THREE.SkeletonUtils)throw 'loaders missing';
  const VKEYS=['huey','prado','bugatti','amg','p918'];const [sol,mich,rpm,c1,c2,...vs]=await Promise.all(['h_Soldier.json','h_Michelle.json','h_readyplayer.me.json','car1.json','car2.json',...VKEYS.map(k=>k+'.json')].map(u=>loadGLB(u).catch(e=>{console.warn('model fail',u,e);return null;})));
  try{aoTex=await new Promise((res,rej)=>new THREE.TextureLoader().load('models/car1_ao.png',res,undefined,rej));}catch(e){}
- if(sol){const clips=sol.animations;SOL_SRC={scene:THREE.SkeletonUtils.clone(sol.scene),clips};MODELS.hum.push(prepHuman(rpm?rpm:sol,clips,rpm?'rpm':'sol'));if(mich)MODELS.hum.push(prepHuman(mich,clips,'mich'));if(rpm)MODELS.hum.push(prepHuman(sol,clips,'sol'));}
+ if(sol){const clips=sol.animations;SOL_SRC={scene:THREE.SkeletonUtils.clone(sol.scene),clips};MODELS.hum.push(prepHuman(rpm?rpm:sol,clips,rpm?'rpm':'sol'));if(mich)MODELS.hum.push(prepHuman(mich,clips,'mich'));if(rpm)MODELS.hum.push(prepHuman(sol,clips,'sol'));
+  const ex=await Promise.all(HUM2.map(k=>loadGLB('h_'+k+'.json').catch(e=>{console.warn('hum fail',k,e);return null;})));ex.forEach((g,i)=>{if(g)try{MODELS.hum[3+i]=prepHuman2(g,HUM2[i]);}catch(e){console.warn('prep fail',HUM2[i],e);}});}
  if(c1)MODELS.car.car1=prepCar(c1,'car1');if(c2)MODELS.car.car2=prepCar(c2,'car2');VKEYS.forEach((k,i)=>{if(!vs[i])return;if(k.startsWith('v_heli')){const s=vs[i].scene;s.traverse(o=>{if(o.isMesh){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(mt=>{if(mt.isMeshStandardMaterial){mt.side=THREE.DoubleSide;mt.envMap=envTex;stdMats.push(mt);if(mt.name==='glass'){mt.transparent=true;mt.opacity=.35;mt.depthWrite=false;}}});}});MODELS.car[k]={scene:s};}else MODELS.car[k]=prepCar(vs[i],k);});
  MODELS.ready=true;setTimeout(()=>toast(MODELS.hum.length?'Realistic people & vehicles loaded':'Realistic models could not load'),1500);
  // NPC mix: rpm 55%, woman 35%, armoured 10%
- const n=MODELS.hum.length;npcs.forEach((q,i)=>{const r=Math.random();humanize(q.m,n===3?(r<.55?0:r<.9?1:2):i%n);});
- humanize(me,0,ME_LOOK);
+ npcs.forEach((q,i)=>{humanize(q.m,npcHumIdx());});
+ humanize(me,meHum(),ME_LOOK);
  if(quality!=='low'){for(const c of cars){realizeCar(c);if(c.type==='bike')humanizeSeated(c.m.rider,ME_LOOK,true);}for(const h of helis){realizeHeli(h);humanizeSeated(h.m.pilot,ME_LOOK,false);}for(const p of planes)humanizeSeated(p.m.pilot,ME_LOOK,false);}
 }catch(e){console.warn('realistic models unavailable',e);setTimeout(()=>toast('Realistic models could not load here'),2500);}})();
 // hooks
@@ -3355,7 +3324,7 @@ function polishCar(c){const r=c.m.real;if(!r||c.m.polished)return;c.m.polished=t
   else if(/signal/.test(n)){cl();mm.color.set('#d97706');mm.roughness=.3;}});});}
 {const _rc=realizeCar;realizeCar=function(c){_rc(c);polishCar(c);};}
 {const _ac=addCar;addCar=function(...a){const c=_ac(...a);if(MODELS.ready&&quality!=='low'){realizeCar(c);if(c.type==='bike')humanizeSeated(c.m.rider,ME_LOOK,true);}return c;};}
-{const _wo=wearOutfit;wearOutfit=function(i){_wo(i);humanize(me,0,ME_LOOK);};}
+{const _wo=wearOutfit;wearOutfit=function(i){_wo(i);humanize(me,meHum(),ME_LOOK);};}
 function animMe(dt){if(!me.mixer)return;const spd=Math.hypot(P.mvx||0,P.mvz||0);if(!P.onGround){me.mixer.update(dt*.3);return;}setAct(me,spd<.4?'idle':spd<3.2?'walk':'run',.18);if(me.act.walk)me.act.walk.timeScale=Math.max(.6,spd/1.35);if(me.act.run)me.act.run.timeScale=Math.max(.8,spd/5.6);me.mixer.update(dt);return;const mv=Math.hypot(JV.x,JV.y)+((K.KeyW||K.KeyA||K.KeyS||K.KeyD)?1:0);const spr=K.ShiftLeft||K.ShiftRight||Math.hypot(JV.x,JV.y)>.92;
  setAct(me,mv>0?(spr?'run':'walk'):'idle',.2);if(me.act.walk)me.act.walk.timeScale=1.5;me.mixer.update(dt);}
 {const _am=animMe;animMe=function(dt){_am(dt);aimPoseMe();};}
@@ -3387,8 +3356,9 @@ const HELI_MODELS={
  maverick:{name:'Maverick',eye:[.42,2.2,2.4]},
  policeheli:{name:'Police Maverick',eye:[.42,2.1,2.5],police:true},
  comanche:{name:'RAH-66 Comanche',eye:[0,2.3,3.6],armed:true},
- t129:{name:'T129 Atak',eye:[.37,2.4,3.0],armed:true}};
-const V20_KEYS=['f16','rafale','su57','bizjet','maverick','policeheli','comanche','t129','revuelto','koenigsegg','skyline','cybertruck'];
+ t129:{name:'T129 Atak',eye:[.37,2.4,3.0],armed:true},
+ bell206:{name:'Bell 206 JetRanger',eye:[-.3,1.6,1.72]}};
+const V20_KEYS=['f16','rafale','su57','bizjet','policeheli','comanche','t129','revuelto','koenigsegg','skyline','cybertruck','cent','ghost','bell206'];
 
 // ---- aircraft placement helpers ----
 function addPlane2(kind,x,z,yaw){const p=addPlane(x,z,yaw,'light');p.kind=kind;p.spec=PLANE_SPECS[kind];p.mk=kind;
@@ -3572,7 +3542,7 @@ const accM={black:new THREE.MeshStandardMaterial({color:'#050506',metalness:.9,r
 function boneHolder(g,key,root){const B=bonesByKey(g.m.real);const bone=B[key];if(!bone)return null;g.m.root.updateMatrixWorld(true);const ws=new THREE.Vector3();bone.getWorldScale(ws);
  const h=new THREE.Group();h.scale.setScalar(1/ws.x);const qb=new THREE.Quaternion();bone.getWorldQuaternion(qb);const qr=new THREE.Quaternion();g.m.root.getWorldQuaternion(qr);
  h.quaternion.copy(qb.invert().multiply(qr));bone.add(h);return h;}
-function dressGuard(g){if(!g.m.real||g.dressed)return;g.dressed=true;
+function dressGuard(g){if(!g.m.real||g.dressed)return;g.dressed=true;if(g.m.humKind&&g.m.humKind!=='rpm'){const hand=boneHolder(g,'RightHand');if(hand){const gun=makeGunModel('rifle');const w=new THREE.Group();w.add(gun);w.rotation.set(-1.2,0,0);w.position.set(0,.06,.02);hand.add(w);g.gun=w;}return;}
  g.m.real.traverse(o=>{if(!o.isMesh)return;const n=o.material.name||'';
   if(/Outfit_Top/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#111114');o.material.roughness=.42;o.material.metalness=.15;}
   else if(/Outfit_Bottom/.test(n)){o.material=o.material.clone();o.material.map=null;o.material.color.set('#0e0e10');o.material.roughness=.5;}
@@ -3593,7 +3563,7 @@ function hostiles(){return cars.filter(c=>c.mode==='police'&&!c.sunk&&c.mode!=='
 function guardCombat(g,dt){g.cd=(g.cd||0)-dt;if(stars<=0)return null;let best=null,bd=55;for(const c of hostiles()){const d=Math.hypot(c.x-g.x,c.z-g.z);if(d<bd){bd=d;best=c;}}
  if(best&&g.cd<=0){g.cd=rnd(.18,.32);guardShoot(g,best);}return best;}
 // escort guards get dressed + armed once the real models are in
-{const _sh=secHumanize;secHumanize=function(){for(const g of SEC.guards)if(!g.m.real)humanize(g.m,0,SUIT);_sh();for(const g of SEC.guards)dressGuard(g);};}
+{const _sh=secHumanize;secHumanize=function(){for(const g of SEC.guards)if(!g.m.real)humanize(g.m,humIdx('guard'),SUIT);_sh();for(const g of SEC.guards)dressGuard(g);};}
 // guards on foot fire back; escort SUVs fire from the windows
 {const _gs=guardStep;guardStep=function(g,tx,tz,face,dt,run){const t=guardCombat(g,dt);if(t&&Math.hypot(tx-g.x,tz-g.z)<2)face=Math.atan2(t.x-g.x,t.z-g.z);_gs(g,tx,tz,face,dt,run);};}
 {const _em=escortMove;escortMove=function(c,dt){_em(c,dt);
@@ -3606,7 +3576,7 @@ function guardCombat(g,dt){g.cd=(g.cd||0)-dt;if(stars<=0)return null;let best=nu
 // ---------- 4 more guards posted around the mansion (patrolling) ----------
 const HG=[[[31,466],[31,478]],[[71,457.5],[76,457.5]],[[44,493],[66,493]],[[81,478],[88,478]]].map((pp,i)=>{const m=makeHuman({shirt:'#111214',pants:'#111214',skin:pick(SKIN),shades:true,hair:'#111111'});scene.add(m.root);
  return{m,pts:pp,k:0,x:pp[0][0],z:pp[0][1],y:0,h:0,spd:0,wait:rnd(0,3),i:10+i};});
-function houseGuards(dt){for(const g of HG){if(MODELS.ready&&!g.m.real){humanize(g.m,0,SUIT);if(g.m.mixer)setAct(g.m,'idle',0);dressGuard(g);}
+function houseGuards(dt){for(const g of HG){if(MODELS.ready&&!g.m.real){humanize(g.m,humIdx('guard'),SUIT);if(g.m.mixer)setAct(g.m,'idle',0);dressGuard(g);}
  const d=Math.hypot(g.x-P.x,g.z-P.z);g.m.root.visible=d<220;if(!g.m.root.visible)continue;
  const tgt=guardCombat(g,dt);let p=g.pts[g.k];
  if(tgt){g.h+=angDiff(g.h,Math.atan2(tgt.x-g.x,tgt.z-g.z))*Math.min(1,dt*8);const m=g.m;m.root.position.set(g.x,g.y,g.z);m.root.rotation.y=g.h;if(m.mixer){setAct(m,'idle',.2);m.mixer.update(dt);}continue;}
@@ -3748,7 +3718,7 @@ function jetTick(dt){for(const p of planes){if(p.kind!=='bizjet'||!p.m.real)cont
   if(J.pilotState==='board'){const v=jetDoorWorld(p,0);const dx=v.x-pl.x,dz=v.z-pl.z,dd=Math.hypot(dx,dz);if(dd>.3){pl.x+=dx/dd*Math.min(dd,2.4*dt);pl.z+=dz/dd*Math.min(dd,2.4*dt);pl.h=Math.atan2(dx,dz);pl.spd=2.4;pl.y=lerp(pl.y,(p.y||0)+JETC.floor*(1-Math.min(1,dd/3)),.2);}else{pl.m.root.visible=false;J.pilotState='aboard';}}
   else pl.spd=0;
   if(p.mode==='parked'&&J.pilotState!=='board'&&!pl.m.root.visible)jetPilotHome(p);
-  if(pl.m.root.visible){if(MODELS.ready&&!pl.m.real){humanize(pl.m,0,{shirt:'#f8fafc',pants:'#0f172a',cap:'#0f172a'});}const m=pl.m;m.root.position.set(pl.x,pl.y,pl.z);m.root.rotation.y=pl.h;if(m.mixer&&d<90){setAct(m,pl.spd>.2?'walk':'idle',.2);m.mixer.update(dt);}}
+  if(pl.m.root.visible){if(MODELS.ready&&!pl.m.real){humanize(pl.m,humIdx('suit'),{shirt:'#f8fafc',pants:'#0f172a',cap:'#0f172a'});}const m=pl.m;m.root.position.set(pl.x,pl.y,pl.z);m.root.rotation.y=pl.h;if(m.mixer&&d<90){setAct(m,pl.spd>.2?'walk':'idle',.2);m.mixer.update(dt);}}
   J.interior.visible=Math.hypot(p.x-camera.position.x,p.z-camera.position.z)<60;J.interior.userData.light.intensity=(P.plane===p&&p.passenger)?.9:0;
   if(jetAsk===p&&Math.hypot(P.x-p.x,P.z-p.z)>16){JCH.hidden=true;jetAsk=null;J.stairWant=0;}}}
 {const _uc=updateCamera;updateCamera=function(dt){_uc(dt);const p=P.plane;if(!p||!p.passenger||!p.jet)return;
@@ -3787,6 +3757,247 @@ function jetCabinE(p){if(!jetInCabin())return false;const A=p.jet.ap;
 if(location.port==='47123'){try{if(!localStorage.getItem('btm_q_mac')){localStorage.setItem('btm_q_mac','1');quality='ultra';localStorage.setItem('btm_q','ultra');}}catch(e){}
  setInterval(()=>{fetch('/__alive').catch(()=>{});},8000);}
 applyQuality();
+
+/* =====================================================================
+   v25 — real people: two-bone IK, both hands on the gun, recoil,
+   limp ragdoll bodies, steering-wheel hands
+   ===================================================================== */
+const IKT={v1:new THREE.Vector3(),v2:new THREE.Vector3(),q1:new THREE.Quaternion(),q2:new THREE.Quaternion(),q3:new THREE.Quaternion()};
+function ikAim(o,child,target){o.updateMatrixWorld(true);const op=o.getWorldPosition(IKT.v1),cp=child.getWorldPosition(IKT.v2);const d0=cp.sub(op).normalize();const d1=target.clone().sub(op).normalize();
+ IKT.q1.setFromUnitVectors(d0,d1);o.getWorldQuaternion(IKT.q2);o.parent.getWorldQuaternion(IKT.q3);o.quaternion.copy(IKT.q3.invert().multiply(IKT.q1.multiply(IKT.q2)));o.updateMatrixWorld(true);}
+function ik2(up,lo,end,target,pole){up.updateMatrixWorld(true);const S=up.getWorldPosition(new THREE.Vector3()),E=lo.getWorldPosition(new THREE.Vector3()),H=end.getWorldPosition(new THREE.Vector3());
+ const a=S.distanceTo(E),b=E.distanceTo(H);if(a<1e-4||b<1e-4)return;const dv=target.clone().sub(S);let d=Math.max(.02,Math.min(dv.length(),(a+b)*.998));const dir=dv.normalize();
+ const ca=clamp((a*a+d*d-b*b)/(2*a*d),-1,1),sa=Math.sqrt(1-ca*ca);const pv=pole.clone().sub(S);pv.addScaledVector(dir,-pv.dot(dir));if(pv.lengthSq()<1e-8)pv.set(0,-1,0);pv.normalize();
+ const elbow=S.clone().addScaledVector(dir,a*ca).addScaledVector(pv,a*sa);ikAim(up,lo,elbow);ikAim(lo,end,S.clone().addScaledVector(dir,d));}
+function armB(root){if(!root)return null;if(root.userData.armB)return root.userData.armB;const B=bonesByKey(root);const r={L:[B.LeftArm,B.LeftForeArm,B.LeftHand],R:[B.RightArm,B.RightForeArm,B.RightHand],B};if(!r.L[0]||!r.R[0])return null;root.userData.armB=r;return r;}
+// local (character space: +z forward, +x = its left, +y up) -> world
+function chrToWorld(root,x,y,z,out){return (out||new THREE.Vector3()).set(x,y,z).applyMatrix4(root.parent.matrixWorld);}
+
+/* ---- the player: rifle at the shoulder, both hands on every weapon ---- */
+const GRIP={pistol:[0,-.012,-.035],shotgun:[0,-.015,-.36],rifle:[0,-.02,-.33],rocket:[0,-.04,-.42]};
+const GK=['','pistol','shotgun','rifle','rocket'];
+function twoHandPose(root,holder,kind,recoil,pitch){const A=armB(root);if(!A||!holder)return;const r=root.parent;r.updateMatrixWorld(true);
+ const sp=A.B.Spine2||A.B.Spine1||A.B.Spine;
+ if(kind!=='pistol'&&sp){// rifle: right hand at the chest, gun shouldered
+  const p=chrToWorld(r,-.13,0,.0);const sh=sp.getWorldPosition(new THREE.Vector3());const ry=r.matrixWorld;const F=new THREE.Vector3(0,0,1).transformDirection(ry),U=new THREE.Vector3(0,1,0),L=new THREE.Vector3(1,0,0).transformDirection(ry);
+  F.y-=pitch*.6+.06;F.normalize();const tgt=sh.clone().addScaledVector(L,-.17).addScaledVector(U,.12).addScaledVector(F,.28-recoil*.07);
+  ik2(A.R[0],A.R[1],A.R[2],tgt,sh.clone().addScaledVector(L,-.8).addScaledVector(U,-.9));}
+ // left hand onto the grip / foregrip
+ holder.updateMatrixWorld(true);const g=GRIP[kind]||GRIP.rifle;const t=new THREE.Vector3(g[0],g[1],g[2]).applyMatrix4(holder.matrixWorld);
+ const ls=A.L[0].getWorldPosition(new THREE.Vector3());const L=new THREE.Vector3(1,0,0).transformDirection(r.matrixWorld);
+ ik2(A.L[0],A.L[1],A.L[2],t,ls.clone().addScaledVector(L,.5).add(new THREE.Vector3(0,-1,0)));}
+{const _ap=aimPoseMe;aimPoseMe=function(){_ap();if(!me.real||P.weapon<=0||!me.root.visible||!TPG.bone)return;const k=GK[P.weapon];const h=TPG.list[P.weapon];if(!h)return;
+  if(k!=='pistol'){// shoulder the long guns, then re-point the gun forward
+   twoHandPose(me.real,h,k,P.recoil||0,P.pitch||0);const ry=me.root.rotation.y;const F=new THREE.Vector3(Math.sin(ry),-.06-(P.pitch||0)*.6,Math.cos(ry)).normalize(),U=new THREE.Vector3(0,1,0),R=new THREE.Vector3().crossVectors(F,U).normalize();U.crossVectors(R,F);
+   const qd=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(R,U,F.clone().negate()));const qb=new THREE.Quaternion();TPG.bone.getWorldQuaternion(qb);h.quaternion.copy(qb.invert().multiply(qd));
+   twoHandPose(me.real,h,k,P.recoil||0,P.pitch||0);}
+  else twoHandPose(me.real,h,k,P.recoil||0,P.pitch||0);
+  // recoil: kick the chest + head back a touch
+  const A=armB(me.real);if(A&&P.recoil>0){const sp=A.B.Spine2;if(sp){sp.rotation.x-=P.recoil*.08;sp.updateMatrixWorld(true);}}};}
+
+{const _tp=tpPose;tpPose=function(){_tp();const bone=TPG.bone;if(!bone||!me.real)return;let mid=null;me.real.traverse(o=>{if(o.isBone&&/RightHandMiddle1$/.test(o.name))mid=o;});me.root.updateMatrixWorld(true);
+ const hp=bone.getWorldPosition(new THREE.Vector3());let wp;if(mid)wp=hp.clone().lerp(mid.getWorldPosition(new THREE.Vector3()),.85);else{const fp=bone.parent.getWorldPosition(new THREE.Vector3());wp=hp.clone().addScaledVector(hp.clone().sub(fp).normalize(),.075);}
+ bone.worldToLocal(wp);for(const g of TPG.list)if(g)g.position.copy(wp);};}
+/* ---- guards / police holding rifles properly ---- */
+function guardHands(g,aiming){const root=g.m&&g.m.real;if(!root||!g.gun||!root.visible)return;const A=armB(root);if(!A)return;root.parent.updateMatrixWorld(true);
+ const sp=A.B.Spine2||A.B.Spine1;if(!sp)return;const r=root.parent,F=new THREE.Vector3(0,0,1).transformDirection(r.matrixWorld),L=new THREE.Vector3(1,0,0).transformDirection(r.matrixWorld),U=new THREE.Vector3(0,1,0);
+ const sh=sp.getWorldPosition(new THREE.Vector3());
+ // aiming: shouldered & level; relaxed: low-ready across the body
+ const tgt=aiming?sh.clone().addScaledVector(L,-.17).addScaledVector(U,.12).addScaledVector(F,.28):sh.clone().addScaledVector(L,-.16).addScaledVector(U,-.22).addScaledVector(F,.22);
+ ik2(A.R[0],A.R[1],A.R[2],tgt,sh.clone().addScaledVector(L,-.8).addScaledVector(U,-.9));
+ const hb=A.R[2];const fd=aiming?F.clone():F.clone().addScaledVector(L,.55).addScaledVector(U,-.55).normalize();const up=new THREE.Vector3(0,1,0),R=new THREE.Vector3().crossVectors(fd,up).normalize();up.crossVectors(R,fd);
+ const qd=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(R,up,fd.clone().negate()));const qb=new THREE.Quaternion();hb.getWorldQuaternion(qb);
+ if(!g.gunBase){g.gunBase=1;g.gun.rotation.set(0,0,0);g.gun.position.set(0,0,0);const m=g.gun.children[0];if(m)m.position.set(0,0,0);}
+ // g.gun sits inside a boneHolder (parent) — orient the gun group in world space
+ const par=g.gun.parent;par.updateMatrixWorld(true);const pq=new THREE.Quaternion();par.getWorldQuaternion(pq);g.gun.quaternion.copy(pq.invert().multiply(qd));
+ const mid=A.B.RightHandMiddle1;if(mid){const wp=mid.getWorldPosition(new THREE.Vector3()).lerp(hb.getWorldPosition(new THREE.Vector3()),.45);par.worldToLocal(wp);g.gun.position.copy(wp);}
+ g.gun.updateMatrixWorld(true);const t=new THREE.Vector3(0,-.02,-.33).applyMatrix4(g.gun.matrixWorld);const ls=A.L[0].getWorldPosition(new THREE.Vector3());
+ ik2(A.L[0],A.L[1],A.L[2],t,ls.clone().addScaledVector(L,.5).add(new THREE.Vector3(0,-1,0)));}
+{const _u=update;update=function(dt){_u(dt);if(gameState!=='play')return;
+  for(const g of SEC.guards){if(g.m.mixer&&!g.inCar)guardHands(g,!!g.target||stars>0);}
+  for(const g of HG)if(g.m&&g.m.mixer)guardHands(g,!!g.target||stars>0);};}
+
+/* ---- limp ragdoll: knocked down / dead people go floppy instead of stiff ---- */
+const LIMP={LeftArm:[.85,-.25,.15],RightArm:[-.85,-.25,.15],LeftForeArm:[.6,-.4,.5],RightForeArm:[-.6,-.4,.5],LeftUpLeg:[.22,-1,.12],RightUpLeg:[-.2,-1,.08],LeftLeg:[.1,-1,-.35],RightLeg:[-.05,-1,-.1]};
+function limpPose(n,dt){const m=n.m,root=m.real;if(!root)return;const B=armB(root);if(!B)return;n.limpW=Math.min(1,(n.limpW||0)+dt*2.5);const w=n.limpW;
+ const seed=n.seed||(n.seed=Math.random()*10);const flail=n.state==='rag'?1:0;m.body.updateMatrixWorld(true);
+ for(const k in LIMP){const o=B.B[k],c=B.B[LIMB_CHAIN[k]];if(!o||!c)continue;const d=LIMP[k];const wob=flail*Math.sin(clock*9+seed+k.length)*.5;
+  const want=new THREE.Vector3(d[0]+wob*.3,d[1]+wob*.2,d[2]+wob).normalize().transformDirection(root.parent.matrixWorld);
+  o.updateMatrixWorld(true);const cur=c.getWorldPosition(new THREE.Vector3()).sub(o.getWorldPosition(new THREE.Vector3())).normalize();const dq=new THREE.Quaternion().setFromUnitVectors(cur,want);
+  const W=o.getWorldQuaternion(new THREE.Quaternion()),PW=o.parent.getWorldQuaternion(new THREE.Quaternion());const tq=PW.invert().multiply(dq.multiply(W));o.quaternion.slerp(tq,w);o.updateMatrixWorld(true);}
+ const hd=B.B.Head;if(hd){hd.rotation.z=lerp(hd.rotation.z,Math.sin(seed)*.5,w);hd.rotation.x=lerp(hd.rotation.x,-.3,w*.5);}}
+{const _an=animNPC;animNPC=function(n,dt){_an(n,dt);if(!n.m.real||!n.m.root.visible)return;if(n.state==='rag'||n.state==='down'||n.state==='dead')limpPose(n,dt);else n.limpW=0;};}
+
+/* =====================================================================
+   v26 — cars with real interiors: Lamborghini Centenario + Rolls-Royce
+   Ghost, you sitting in the seat with both hands on the wheel, clear
+   mirrors, live reflections, cabin light
+   ===================================================================== */
+// model-space data (normalised GLBs: nose +z, car's left = +x)
+const CARINT={
+ cent:{eye:[.36,.92,-.35],wheel:[.36,.70,.1],tilt:.45,r:.165},
+ ghost:{eye:[-.38,1.2,-.5],wheel:[-.38,.95,.05],tilt:.35,r:.19}};
+Object.assign(NEWCARS,{
+ cent:{base:'rossa',prof:{L:4.92,w:2.06,wb:1.4,r:.37,bot:.2},vt:{name:'Lamborghini Centenario',val:12000,max:76,acc:35}},
+ ghost:{base:'terra',prof:{L:5.4,w:2.0,wb:1.65,r:.4,bot:.3},vt:{name:'Rolls-Royce Ghost',val:11000,max:62,acc:24}}});
+for(const k of['cent','ghost']){const d=NEWCARS[k];PROF[k]=d.prof;VT[k]=Object.assign({l:d.prof.L,w:d.prof.w},d.vt);CARMAP[k]=k;}
+// interior data lives on the car once the real model is in
+{const _rc=realizeCar;realizeCar=function(c){_rc(c);const key=CARMAP[c.type],ci=typeof key==='string'&&CARINT[key];if(!ci||!c.m.real)return;const hd=c.m.real;hd.updateMatrix();
+  if(key==='cent'&&c.m.color&&c.m.color!=='#111111'){hd.traverse(o=>{if(o.isMesh&&o.material&&o.material.name==='Carbon_R'){o.material=o.material.clone();o.material.map=null;o.material.color.set(c.m.color);o.material.metalness=.65;o.material.roughness=.22;}});}
+  const tb=a=>new THREE.Vector3(...a).applyMatrix4(hd.matrix);c.m.realInterior=true;const e=tb(ci.eye);c.m.eye=[e.x,e.y,e.z];c.m.wheelC=tb(ci.wheel);c.m.wheelTilt=ci.tilt;c.m.wheelR=ci.r*hd.scale.x;};}
+// mirrors on every model (French "miroir" spelling too)
+mirrorMeshesOf=function(c){const list=[];const r=c.m.real;if(!r)return list;r.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];if(ms.some(m=>/mirr?oi?r/i.test(m.name||'')&&!/red/i.test(m.name||'')))list.push(o);});return list;};
+{const src=attachMirrors.toString().replace(/\/mirror\/i/g,'/mirr?oi?r/i');attachMirrors=(0,eval)('('+src+')');}
+
+/* ---- you, seated, hands on the wheel ---- */
+const DRV={h:null,car:null,head:null};
+function wheelPt(m,th,out){const C=m.wheelC,r=m.wheelR||.17,t=m.wheelTilt||.4;return out.set(C.x+Math.cos(th)*r,C.y+Math.sin(th)*r*Math.cos(t),C.z+Math.sin(th)*r*Math.sin(t)*-1);}
+function ensureDriver(c){if(DRV.car===c&&DRV.h)return;dropDriver();if(!c||c.m.T.bike||!c.m.real||!MODELS.ready)return;const m=c.m,k=m.cab;
+ const h=makeHuman({});humanizeSeated(h,ME_LOOK,false);if(!h.real)return;h.root.scale.setScalar(.97);m.body.add(h.root);
+ if(!m.wheelC&&k){m.wheelC=new THREE.Vector3(k.seatX,k.belt+.05,k.seatZ+.5);m.wheelTilt=.5;m.wheelR=.17;}
+ const ex=m.eye?m.eye[0]:k?k.seatX:.4,ez=m.eye?m.eye[2]:k?k.seatZ:0;h.root.position.set(ex,0,ez-.05);m.body.updateMatrixWorld(true);
+ const B=bonesByKey(h.real);const hb=B.Head;if(hb){const v=hb.getWorldPosition(new THREE.Vector3());m.body.worldToLocal(v);const want=m.eye?m.eye[1]-.05:(k?k.belt+.55:1);h.root.position.y=want-v.y;h.root.position.z+=(ez-.17)-v.z;}
+ h.real.traverse(o=>{if(o.isMesh)o.castShadow=true;});DRV.h=h;DRV.car=c;DRV.head=hb;DRV.B=B;}
+function dropDriver(){if(DRV.h&&DRV.h.root.parent)DRV.h.root.parent.remove(DRV.h.root);DRV.h=null;DRV.car=null;}
+const _wv1=new THREE.Vector3(),_wv2=new THREE.Vector3();
+function driveHands(dt){const c=DRV.car,h=DRV.h;if(!c||!h||!h.real)return;const m=c.m;if(!m.wheelC)return;const A=armB(h.real);if(!A)return;
+ const inside=P.camMode===2;if(DRV.head)DRV.head.scale.setScalar(inside?.001:1);h.root.visible=true;
+ const s=clamp((c.steer||0)*2.2,-1.6,1.6);m.body.updateMatrixWorld(true);
+ const L=wheelPt(m,.35-s,_wv1).clone().applyMatrix4(m.body.matrixWorld),R=wheelPt(m,Math.PI-.35-s,_wv2).clone().applyMatrix4(m.body.matrixWorld);
+ const sl=A.L[0].getWorldPosition(new THREE.Vector3()),sr=A.R[0].getWorldPosition(new THREE.Vector3());
+ const lx=new THREE.Vector3(1,0,0).transformDirection(m.body.matrixWorld),dn=new THREE.Vector3(0,-1,0);
+ ik2(A.L[0],A.L[1],A.L[2],L,sl.clone().addScaledVector(lx,.5).add(dn));ik2(A.R[0],A.R[1],A.R[2],R,sr.clone().addScaledVector(lx,-.5).add(dn));}
+{const _u=update;update=function(dt){_u(dt);if(P.car&&!P.car.m.T.bike)ensureDriver(P.car);else if(DRV.car&&P.car!==DRV.car){if(DRV.car.mode==='parked'||!P.car)dropDriver();}
+  if(gameState==='play')driveHands(dt);};}
+// NPC drivers of nearby cars hold the wheel too
+{const _u=update;update=function(dt){_u(dt);if(gameState!=='play'||quality==='low')return;for(const c of cars){const d=c.m.driver;if(!d||!d.real||c===P.car)continue;if(Math.abs(c.x-P.x)>30||Math.abs(c.z-P.z)>30)continue;
+  const m=c.m,k=m.cab;if(!m.wheelC&&k){m.wheelC=new THREE.Vector3(k.seatX,k.belt+.05,k.seatZ+.5);m.wheelTilt=.5;m.wheelR=.17;}if(!m.wheelC)continue;const A=armB(d.real);if(!A)continue;const s=clamp((c.steer||0)*2.2,-1.6,1.6);m.body.updateMatrixWorld(true);
+  const L=wheelPt(m,.35-s,_wv1).clone().applyMatrix4(m.body.matrixWorld),R=wheelPt(m,Math.PI-.35-s,_wv2).clone().applyMatrix4(m.body.matrixWorld);const lx=new THREE.Vector3(1,0,0).transformDirection(m.body.matrixWorld),dn=new THREE.Vector3(0,-1,0);
+  ik2(A.L[0],A.L[1],A.L[2],L,A.L[0].getWorldPosition(new THREE.Vector3()).addScaledVector(lx,.5).add(dn));ik2(A.R[0],A.R[1],A.R[2],R,A.R[0].getWorldPosition(new THREE.Vector3()).addScaledVector(lx,-.5).add(dn));}};}
+
+/* ---- cabin light + live reflections on your car ---- */
+const CABL=new THREE.PointLight('#fff4e0',0,2.6,2);scene.add(CABL);
+const REFL={rt:null,cam:null,car:null,f:0,saved:[]};
+function reflOn(c){reflOff();if(quality!=='ultra')return;if(!REFL.rt){REFL.rt=new THREE.WebGLCubeRenderTarget(quality==='ultra'?256:128,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter});REFL.rt.texture.encoding=renderer.outputEncoding;REFL.cam=new THREE.CubeCamera(.5,350,REFL.rt);scene.add(REFL.cam);}
+ c.m.real&&c.m.real.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const mt of ms)if(mt.isMeshStandardMaterial&&!REFL.saved.some(s=>s[0]===mt)){REFL.saved.push([mt,mt.envMap,mt.envMapIntensity]);mt.envMap=REFL.rt.texture;mt.envMapIntensity=Math.max(mt.envMapIntensity||1,1.2);mt.needsUpdate=true;}});REFL.car=c;}
+function reflOff(){for(const [mt,e,i] of REFL.saved){mt.envMap=e;mt.envMapIntensity=i;mt.needsUpdate=true;}REFL.saved=[];REFL.car=null;}
+{const _u=update;update=function(dt){_u(dt);const c=P.car;if(c!==REFL.car){if(c&&c.m.real)reflOn(c);else reflOff();}
+  if(c){const inside=P.camMode===2&&c.m.realInterior;CABL.intensity=inside?(isNight()?1.6:.9):0;if(inside){const v=new THREE.Vector3(c.m.eye[0]*.3,c.m.eye[1]+.05,c.m.eye[2]+.3);c.m.body.localToWorld(v);CABL.position.copy(v);}}else CABL.intensity=0;
+  if(REFL.car&&REFL.cam&&gameState==='play'&&(REFL.f++)%5===0){const r=REFL.car.m.real;r.visible=false;const dv=DRV.h&&DRV.h.root.visible;if(DRV.h)DRV.h.root.visible=false;REFL.cam.position.set(c.x,c.y+.9,c.z);const au=renderer.shadowMap.autoUpdate;renderer.shadowMap.autoUpdate=false;REFL.cam.update(renderer,scene);renderer.shadowMap.autoUpdate=au;r.visible=true;if(DRV.h)DRV.h.root.visible=dv;}};}
+function isNight(){return typeof tod!=='undefined'&&(tod<6.3||tod>19.2);}
+
+/* ---- where to find them ---- */
+addCar('cent',53,457.6,Math.PI/2,'parked','#111111');addCar('ghost',59.5,457.6,Math.PI/2,'parked','#0b0b0d');
+addCar('cent',448,343,0,'parked','#f2c200');addCar('ghost',-356,98,0,'parked','#e8e6e1');addCar('cent',740,48,Math.PI,'parked','#16a34a');
+
+/* =====================================================================
+   v27 — the private jet is now a real Embraer Phenom 300 with its own
+   cabin: leather club seats, wood, galley, airstair door. A cream cabin
+   lining with real window openings goes inside the fuselage.
+   ===================================================================== */
+Object.assign(JETC,{floor:1.48,ceil:3.36,hw:1.0,z0:2.35,z1:6.3,door:{x:1.12,z:4.85},real:true,
+ wins:[-.3,1.15,2.15,3.05,3.95],doorZ:[4.42,5.3],
+ seats:[{x:-.62,z:3.62,face:1},{x:-.62,z:2.62,face:1},{x:.62,z:3.87,face:1},{x:.62,z:2.87,face:1}],
+ rects:[{x0:-.95,x1:-.33,z0:3.25,z1:3.95},{x0:-.95,x1:-.33,z0:2.3,z1:2.95},{x0:.33,x1:.95,z0:3.5,z1:4.2},{x0:.33,x1:.95,z0:2.5,z1:3.2},
+  {x0:-1.0,x1:-.42,z0:4.2,z1:5.05},{x0:-1.0,x1:-.42,z0:5.45,z1:6.35},{x0:.5,x1:1.0,z0:5.65,z1:6.35}]});
+PLANE_SPECS.bizjet.eye=[.42,2.55,6.75];
+buildJetInterior=function(){const g=new THREE.Group(),IB=new Builder();const F=JETC.floor,W=.99,CREAM='#ece3cf',CARP='#3b3f48',TRIM='#7a5634';
+ // carpet runner + lower sidewalls (door gap on the right/+x side)
+ IB.box(0,F+.004,(JETC.z0+JETC.z1)/2-.6,1.86,.012,JETC.z1-JETC.z0+1.2,CARP);
+ const z0=-.75,z1=6.3,[d0,d1]=JETC.doorZ;
+ for(const s of[-1,1]){const segs=s>0?[[z0,d0],[d1,z1]]:[[z0,z1]];
+  for(const [a,b] of segs){IB.box(s*W,F,(a+b)/2,.05,.78,b-a,CREAM);IB.box(s*(W-.03),F+.78,(a+b)/2,.08,.04,b-a,TRIM);
+   // upper wall with window openings
+   let z=a;const ws=JETC.wins.filter(w=>w>a+.25&&w<b-.25);for(const w of ws){if(w-.22>z)IB.box(s*(W-.02),F+.82,(z+w-.22)/2,.05,.86,w-.22-z,CREAM);
+    IB.box(s*(W-.02),F+.82,w,.05,.24,.44,CREAM);IB.box(s*(W-.02),F+1.48,w,.05,.2,.44,CREAM);z=w+.22;}
+   if(b>z)IB.box(s*(W-.02),F+.82,(z+b)/2,.05,.86,b-z,CREAM);
+   IB.add(G.boxc,s*(W-.2),F+1.68,(a+b)/2,.44,.05,b-a,CREAM,0,0,s*.62,0);}
+  // door frame on the right
+  if(s>0){IB.box(W-.02,F+1.78,(d0+d1)/2,.06,.1,d1-d0,CREAM);for(const z of[d0,d1])IB.box(W-.02,F,z,.08,1.86,.06,TRIM);}}
+ // ceiling panel + light strip
+ IB.box(0,JETC.ceil-.1,2.75,1.62,.04,7.1,'#f4efe4');for(let z=-.4;z<6.2;z+=1.1)IB.box(0,JETC.ceil-.125,z,.5,.02,.1,'#fff6d8');
+ g.add(IB.mesh(new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,metalness:.02})));
+ const lt=new THREE.PointLight('#fff1d6',0,9,2);lt.position.set(0,JETC.ceil-.3,3.2);g.add(lt);g.userData.light=lt;return g;};
+buildStairs=function(){const g=new THREE.Group();g.add(new THREE.Group());return g;};
+// model fixes: see-through windows, skin rendered one-sided so the cabin lining shows
+const PHENOM_SKIN=/^(Color_000|Color_D01|Color_I21)$/;
+function fixPhenom(inst,p){const plug=new THREE.Mesh(new THREE.BoxGeometry(.06,1.75,.9),new THREE.MeshStandardMaterial({color:'#f2f2f0',metalness:.3,roughness:.35}));plug.position.set(1.2,JETC.floor+.88,JETC.door.z);inst.add(plug);
+ inst.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];const nm=ms.map(mt=>{const n=mt.name||'';
+  if(n==='Color_008'){const g=new THREE.MeshStandardMaterial({name:'glass',color:'#9ec3da',metalness:.2,roughness:.04,transparent:true,opacity:.32,depthWrite:false,envMap:envTex,envMapIntensity:1.4});return g;}
+  if(PHENOM_SKIN.test(n)){const c=mt.clone();c.metalness=Math.max(c.metalness,.35);c.roughness=Math.min(c.roughness,.32);c.envMap=envTex;c.envMapIntensity=1.1;return c;}
+  return mt;});o.material=Array.isArray(o.material)?nm:nm[0];});
+ p.jetStairs=inst.getObjectByName('stairs');p.jetPlug=plug;}
+{const _rp=realizePlane;realizePlane=function(p){const had=!!p.m.real;_rp(p);if(had||!p.m.real||p.kind!=='bizjet')return;fixPhenom(p.m.real,p);p.m.realInterior=true;p.m.eye=PLANE_SPECS.bizjet.eye.slice();};}
+{const _u=update;update=function(dt){_u(dt);for(const p of planes){if(p.kind!=='bizjet'||!p.jet)continue;const J=p.jet;if(J.stairs)J.stairs.visible=false;const dn=J.stairT>.45;if(p.jetStairs)p.jetStairs.visible=dn;if(p.jetPlug)p.jetPlug.visible=!dn;}};}
+// the real model stays visible from the cabin
+{const _uc=updateCamera;updateCamera=function(dt){_uc(dt);const p=P.plane;if(p&&p.kind==='bizjet'&&p.m.real&&(p.passenger||P.camMode===2))p.m.real.visible=true;};}
+// walking inside the Phenom cabin
+jetWalk=function(dt){if(!jetInCabin())return;const fw=((K.KeyW||K.ArrowUp)?1:0)-((K.KeyS||K.ArrowDown)?1:0)-(JV.y||0),st=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0)+(JV.x||0);
+ if(Math.abs(fw)+Math.abs(st)<.15)return;if(JW.seat)JW.seat=null;const sp=2.0*dt,a=JW.a;JW.x+=(Math.sin(a)*fw-Math.cos(a)*st)*sp;JW.z+=(Math.cos(a)*fw+Math.sin(a)*st)*sp;
+ const r=.22;JW.z=clamp(JW.z,JETC.z0+.1,JETC.z1-.05);const atDoor=JW.z>JETC.doorZ[0]+.1&&JW.z<JETC.doorZ[1]-.1;JW.x=clamp(JW.x,-.72,atDoor?.92:.72);
+ for(const b of JETC.rects){const cx=clamp(JW.x,b.x0,b.x1),cz=clamp(JW.z,b.z0,b.z1),dx=JW.x-cx,dz=JW.z-cz,d=Math.hypot(dx,dz);if(d<r){if(d>1e-4){JW.x=cx+dx/d*r;JW.z=cz+dz/d*r;}else JW.x+=(JW.x<(b.x0+b.x1)/2?-1:1)*.05;}}};
+// set the jets up at load so their cabin lights exist from the start (adding a light later forces every shader to recompile = big freeze)
+for(const p of planes)if(p.kind==='bizjet')jetSetup(p);
+const nearJetDoor=()=>JW.z>JETC.doorZ[0]-.15&&JW.z<JETC.doorZ[1]+.15&&JW.x>.3;
+jetCabinE=function(p){if(!jetInCabin())return false;const A=p.jet.ap;
+ if(!JW.seat){let best=null,bd=1.0;for(const s of JETC.seats){const d=Math.hypot(s.x-JW.x,s.z-JW.z);if(d<bd){bd=d;best=s;}}
+  if(best&&!(nearJetDoor()&&p.speed<1&&(!A||A.phase==='parked'||(A.phase==='wait'&&A.seated)))){JW.seat=best;JW.x=best.x;JW.z=best.z+.05;JW.a=best.face>0?0:Math.PI;JW.pitch=-.05;
+   if(A&&A.phase==='wait'&&!A.seated){A.seated=true;toast('Pilot: seatbelt sign is on — here we go');}else toast('Seated');return true;}}
+ if(nearJetDoor()&&p.speed<1&&(!A||A.phase==='parked'||A.phase==='wait'))return false;
+ if(!JW.seat)toast(p.speed>1?'Find a seat (E) — you can get off once we have landed':'Walk to a seat and press E to sit, or go to the door (E) to get off');else toast('Walk to the door to get off');return true;};
+// boarding puts you just inside the door, facing the cabin
+{const _jc=jetChoose;jetChoose=function(pilot){const p=jetAsk;_jc(pilot);if(p&&p.jet&&p.jet.boardFn&&pilot){const f=p.jet.boardFn;p.jet.boardFn=()=>{f();Object.assign(JW,{x:.55,z:JETC.door.z,a:-Math.PI/2-.55,pitch:-.05,seat:null});};}};}
+
+/* =====================================================================
+   v28 — new VIP estate house: a real modern villa (glass, pool, two
+   floors, stairs, roof terrace) you can walk through. Collision comes
+   from the model itself (floor levels + walls baked offline).
+   ===================================================================== */
+const VLA={cx:56,cz:476.5,yoff:-1.45,rot:Math.PI,col:null,mesh:null};
+function villaToModel(x,z){return VLA.rot?[VLA.cx-x,VLA.cz-z]:[x-VLA.cx,z-VLA.cz];}
+function villaLevels(x,z){const c=VLA.col;if(!c)return null;const [mx,mz]=villaToModel(x,z);const i=Math.floor((mx-c.x0)/c.C),j=Math.floor((c.z1-mz)/c.C);if(i<0||j<0||i>=c.nx||j>=c.ny)return null;return c.cells[j][i];}
+{const _fa=floorAt;floorAt=function(x,z,y){const g=_fa(x,z,y);if(!VLA.col||Math.abs(x-VLA.cx)>17||Math.abs(z-VLA.cz)>21)return g;const lv=villaLevels(x,z);if(!lv||!lv.length)return g;
+  let best=-1e9;for(const L of lv){const h=L+VLA.yoff;if(h<=y+.75&&h>best)best=h;}return best>-1e8?Math.max(g,best):g;};}
+(async()=>{const wait=()=>new Promise(r=>{const t=()=>MODELS.ready?r():setTimeout(t,400);t();});await wait();
+ try{const [g,col]=await Promise.all([loadGLB('villa.json'),fetch('m/villa_col.json').then(r=>r.json())]);VLA.col=col;
+  const s=g.scene;s.rotation.y=VLA.rot;s.position.set(VLA.cx,VLA.yoff,VLA.cz);
+  s.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;const ms=Array.isArray(o.material)?o.material:[o.material];
+   ms.forEach(m=>{if(!m.isMeshStandardMaterial)return;m.envMap=envTex;m.envMapIntensity=.8;stdMats.push(m);
+    if(/glass/i.test(m.name)){m.transparent=true;m.opacity=.28;m.depthWrite=false;m.color.set('#a9d4ee');m.metalness=.3;m.roughness=.05;m.envMapIntensity=1.6;}
+    if(/estakhr/i.test(m.name)&&/plastik/i.test(m.name)){m.color.set('#2fb6ef');m.roughness=.08;m.metalness=.1;}});});
+  scene.add(s);VLA.mesh=s;
+  // walls -> collision boxes with height bands (so upstairs walls don't block downstairs)
+  for(const w of col.walls){const [a,b,c0,c1,y0,h]=w;const x0=VLA.rot?VLA.cx-b:VLA.cx+a,x1=VLA.rot?VLA.cx-a:VLA.cx+b,z0=VLA.rot?VLA.cz-c1:VLA.cz+c0,z1=VLA.rot?VLA.cz-c0:VLA.cz+c1;
+   gridAdd({x0,x1,z0,z1,y0:Math.max(.01,y0+VLA.yoff+.35),h:h+VLA.yoff});}
+  // interior lights for the evening
+  for(const [x,y,z] of[[56,3.2,470],[50,3.2,474],[62,3.2,474],[56,6.6,472]]){const l=new THREE.PointLight('#ffe7c2',0,14,2);l.position.set(x,y,z);scene.add(l);VLA.lights=(VLA.lights||[]).concat(l);}
+ }catch(e){console.warn('villa failed',e);}})();
+{const _u=update;update=function(dt){_u(dt);if(VLA.lights){const n=typeof tod!=='undefined'&&(tod<6.5||tod>18.6);for(const l of VLA.lights)l.intensity=n?1.4:0;}};}
+PLACES.push({name:'VIP Villa (walk inside)',icon:'★',col:'#d4af37',x:56,z:470});
+
+/* =====================================================================
+   v29 — Vinewood Downtown skyline: real skyscraper models
+   ===================================================================== */
+const SKYT=[['b_sky1',755,390,330,0],['b_atlanta',845,390,150,Math.PI/2],['b_boc',755,485,165,0],['b_wtc3',845,485,135,Math.PI],['b_highrise',755,307,110,0]];
+(async()=>{const wait=()=>new Promise(r=>{const t=()=>MODELS.ready?r():setTimeout(t,500);t();});await wait();
+ for(const [k,x,z,H,ry] of SKYT){try{const g=await loadGLB(k+'.json');const s=g.scene;s.rotation.y=ry;s.updateMatrixWorld(true);
+  const b=new THREE.Box3().setFromObject(s),sz=b.getSize(new THREE.Vector3());const sc=H/sz.y;s.scale.setScalar(sc);s.updateMatrixWorld(true);
+  const b2=new THREE.Box3().setFromObject(s),c=b2.getCenter(new THREE.Vector3());s.position.set(x-c.x,-b2.min.y,z-c.z);
+  s.traverse(o=>{if(!o.isMesh)return;o.castShadow=true;o.receiveShadow=true;const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if(m.isMeshStandardMaterial){m.envMap=envTex;m.envMapIntensity=1.2;stdMats.push(m);}});});
+  scene.add(s);s.updateMatrixWorld(true);const fb=new THREE.Box3().setFromObject(s);
+  // footprint collision (slightly inset so plazas stay walkable)
+  const ix=Math.min(3,(fb.max.x-fb.min.x)*.08),iz=Math.min(3,(fb.max.z-fb.min.z)*.08);gridAdd({x0:fb.min.x+ix,x1:fb.max.x-ix,z0:fb.min.z+iz,z1:fb.max.z-iz,h:fb.max.y});
+  lampPos.push(x,fb.max.y+2,z);}catch(e){console.warn('tower fail',k,e);}}})();
+PLACES.push({name:'Vinewood Downtown (skyscrapers)',icon:'▲',col:'#38bdf8',x:800,z:440});
+
+/* ---- v30: luxury Bell 206 JetRanger with a full cockpit (replaces the Maverick) ---- */
+for(const h of helis)if(h.mk==='maverick'){h.mk='bell206';if(!h.col||h.col==='#5c636c')h.col='#f4f4f2';}
+{const _rh=realizeHeli;realizeHeli=function(h){const had=!!h.m.real;_rh(h);if(had||h.mk!=='bell206'||!h.m.real)return;const m=h.m;m.realInterior=true;m.eye=HELI_MODELS.bell206.eye.slice();
+  m.real.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];const nm=ms.map(mt=>{if(/^transparent/.test(mt.name||'')){const c=mt.clone();c.transparent=true;c.opacity=.22;c.depthWrite=false;c.color.set('#bcdcef');c.metalness=.4;c.roughness=.05;c.envMap=envTex;return c;}return mt;});o.material=Array.isArray(o.material)?nm:nm[0];});};}
+
+/* ---- v31: distance culling for the detailed cars (keeps the M1 smooth) ---- */
+{let lodT=0;const _u=update;update=function(dt){_u(dt);lodT-=dt;if(lodT>0)return;lodT=.3;const R=quality==='ultra'?230:quality==='high'?180:130,cx=camera.position.x,cz=camera.position.z;
+  for(const c of cars){const r=c.m.real;if(!r)continue;const v=c===P.car||Math.abs(c.x-cx)+Math.abs(c.z-cz)<R*1.3&&Math.hypot(c.x-cx,c.z-cz)<R;if(r.visible!==v&&!(c===P.car&&P.camMode===2&&!c.m.realInterior))r.visible=v;if(c.m.driver)c.m.driver.root.visible=v&&c.mode!=='parked';}};}
 
 requestAnimationFrame(loop);
 </script>
